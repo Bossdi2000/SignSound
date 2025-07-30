@@ -1,68 +1,244 @@
-"use client";
-
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+"use client"
+import { useState, useEffect, useRef } from "react"
+import { motion } from "framer-motion"
 
 const HeroSection = () => {
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [volume, setVolume] = useState(75);
-  const [currentTime, setCurrentTime] = useState(0);
+  const [currentSlide, setCurrentSlide] = useState(0)
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [volume, setVolume] = useState(75)
+  const [currentTime, setCurrentTime] = useState(0)
+  const [duration, setDuration] = useState(0)
+  const [isLoading, setIsLoading] = useState(false)
   const [windowSize, setWindowSize] = useState({
-    width: typeof window !== 'undefined' ? window.innerWidth : 1200,
-    height: typeof window !== 'undefined' ? window.innerHeight : 800,
-  });
+    width: typeof window !== "undefined" ? window.innerWidth : 1200,
+    height: typeof window !== "undefined" ? window.innerHeight : 800,
+  })
+
+  // Use useRef for audio element to prevent recreation
+  const audioRef = useRef(null)
 
   // Colors
-  const flashingOrange = '#FF4500';
-  const black = '#000000';
-  const darkGray = '#1a1a1a';
+  const flashingOrange = "#FF4500"
+  const black = "#000000"
+  const darkGray = "#1a1a1a"
 
-  // Responsive breakpoints
+  // Music tracks for random selection
+  const musicTracks = [
+    {
+      name: "Chill Vibes",
+      duration: 185,
+      artist: "SignSound Studios",
+      src: "Odumodu.mp3", // Demo audio
+    },
+    {
+      name: "Urban Beat",
+      duration: 220,
+      artist: "Digital Waves",
+      src: "Wizkid.mp3", // Demo audio
+    },
+  ]
+
+  const [currentTrack, setCurrentTrack] = useState(0)
+
+  // Enhanced responsive breakpoints and audio setup
   useEffect(() => {
+    // Create audio element only once
+    if (!audioRef.current) {
+      audioRef.current = new Audio()
+      audioRef.current.preload = "metadata"
+      audioRef.current.volume = volume / 100
+    }
+
+    const audio = audioRef.current
+
+    // Audio event listeners
+    const handleTimeUpdate = () => {
+      setCurrentTime(Math.floor(audio.currentTime))
+    }
+
+    const handleLoadedMetadata = () => {
+      setDuration(Math.floor(audio.duration) || musicTracks[currentTrack].duration)
+      setIsLoading(false)
+    }
+
+    const handleLoadStart = () => {
+      setIsLoading(true)
+    }
+
+    const handleCanPlay = () => {
+      setIsLoading(false)
+    }
+
+    const handleEnded = () => {
+      // Auto-advance to next track
+      const nextTrackIndex = (currentTrack + 1) % musicTracks.length
+      setCurrentTrack(nextTrackIndex)
+      setCurrentTime(0)
+      // Don't auto-play next track, let user control
+      setIsPlaying(false)
+    }
+
+    const handleError = (e) => {
+      console.warn("Audio file not found:", musicTracks[currentTrack].src, "Error:", e)
+      setIsLoading(false)
+      setIsPlaying(false)
+      // Use fallback duration from track info
+      setDuration(musicTracks[currentTrack].duration)
+    }
+
+    // Add event listeners
+    audio.addEventListener("timeupdate", handleTimeUpdate)
+    audio.addEventListener("loadedmetadata", handleLoadedMetadata)
+    audio.addEventListener("loadstart", handleLoadStart)
+    audio.addEventListener("canplay", handleCanPlay)
+    audio.addEventListener("ended", handleEnded)
+    audio.addEventListener("error", handleError)
+
+    // Set initial track
+    if (audio.src !== musicTracks[currentTrack].src) {
+      audio.src = musicTracks[currentTrack].src
+    }
+
+    // Slide interval
     const slideInterval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
-    }, 5000);
+      setCurrentSlide((prev) => (prev + 1) % heroSlides.length)
+    }, 5000)
 
-    const timeInterval = setInterval(() => {
-      setCurrentTime((prev) => (prev + 1) % 180); // 3 minute loop
-    }, 1000);
-
+    // Window resize handler
     const debounce = (fn, ms) => {
-      let timeout;
+      let timeout
       return (...args) => {
-        clearTimeout(timeout);
-        timeout = setTimeout(() => fn(...args), ms);
-      };
-    };
+        clearTimeout(timeout)
+        timeout = setTimeout(() => fn(...args), ms)
+      }
+    }
 
     const handleResize = debounce(() => {
       setWindowSize({
         width: window.innerWidth,
         height: window.innerHeight,
-      });
-    }, 100);
+      })
+    }, 100)
 
-    window.addEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize)
+
     return () => {
-      clearInterval(slideInterval);
-      clearInterval(timeInterval);
-      window.removeEventListener('resize', handleResize);
-    };
-  }, []);
+      clearInterval(slideInterval)
+      window.removeEventListener("resize", handleResize)
 
-  const isXSmall = windowSize.width < 480;
-  const isMobile = windowSize.width >= 480 && windowSize.width < 640;
-  const isTablet = windowSize.width >= 640 && windowSize.width < 1024;
+      // Clean up audio listeners
+      audio.removeEventListener("timeupdate", handleTimeUpdate)
+      audio.removeEventListener("loadedmetadata", handleLoadedMetadata)
+      audio.removeEventListener("loadstart", handleLoadStart)
+      audio.removeEventListener("canplay", handleCanPlay)
+      audio.removeEventListener("ended", handleEnded)
+      audio.removeEventListener("error", handleError)
+    }
+  }, [])
+
+  // Handle track changes
+  useEffect(() => {
+    if (audioRef.current) {
+      const audio = audioRef.current
+      const wasPlaying = isPlaying
+
+      // Pause current track
+      audio.pause()
+      setIsPlaying(false)
+      setCurrentTime(0)
+      setIsLoading(true)
+
+      // Load new track
+      audio.src = musicTracks[currentTrack].src
+      audio.load()
+
+      // If was playing, resume playback when ready
+      if (wasPlaying) {
+        const playWhenReady = () => {
+          audio
+            .play()
+            .then(() => {
+              setIsPlaying(true)
+            })
+            .catch((e) => {
+              console.warn("Playback failed:", e)
+              setIsPlaying(false)
+            })
+          audio.removeEventListener("canplay", playWhenReady)
+        }
+        audio.addEventListener("canplay", playWhenReady)
+      }
+    }
+  }, [currentTrack])
+
+  // Handle volume changes
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = volume / 100
+    }
+  }, [volume])
+
+  // Enhanced responsive breakpoints
+  const isXSmall = windowSize.width < 375
+  const isSmall = windowSize.width >= 375 && windowSize.width < 640
+  const isMobile = windowSize.width >= 640 && windowSize.width < 768
+  const isTablet = windowSize.width >= 768 && windowSize.width < 1024
+  const isLarge = windowSize.width >= 1024
 
   const heroSlides = [
     {
       title: "Sound Design",
       subtitle: "Innovation",
-      description: "Cutting-edge audio solutions for film, games, and digital media",
-      bg: "linear-gradient(135deg, #1a1a1a 0%, #FF6500 50%, #000000 100%)",
+      bg: "linear-gradient(135deg, rgba(26, 26, 26, 0.7) 0%, rgba(255, 101, 0, 0.6) 50%, rgba(0, 0, 0, 0.8) 100%)",
     },
-  ];
+  ]
+
+  // Enhanced responsive font sizes
+  const getTitleFontSize = () => {
+    if (isXSmall) return "2rem"
+    if (isSmall) return "2.5rem"
+    if (isMobile) return "3.5rem"
+    if (isTablet) return "4.5rem"
+    return "6rem" // Large screens
+  }
+
+  const getSubtitleFontSize = () => {
+    if (isXSmall) return "2.5rem"
+    if (isSmall) return "3.5rem"
+    if (isMobile) return "4.5rem"
+    if (isTablet) return "6rem"
+    return "8rem" // Large screens - Much bigger for "Innovation"
+  }
+
+  const getDescriptionFontSize = () => {
+    if (isXSmall) return "0.9rem"
+    if (isSmall) return "1rem"
+    if (isMobile) return "1.2rem"
+    if (isTablet) return "1.4rem"
+    return "1.6rem" // Large screens
+  }
+
+  const getButtonFontSize = () => {
+    if (isXSmall) return "0.9rem"
+    if (isSmall) return "1rem"
+    if (isMobile) return "1.1rem"
+    return "1.3rem" // Tablet and above
+  }
+
+  const getButtonPadding = () => {
+    if (isXSmall) return "0.8rem 2rem"
+    if (isSmall) return "1rem 2.5rem"
+    if (isMobile) return "1.2rem 3rem"
+    return "1.5rem 4rem" // Tablet and above
+  }
+
+  const getTopPadding = () => {
+    if (isXSmall) return "80px"
+    if (isSmall) return "100px"
+    if (isMobile) return "120px"
+    if (isTablet) return "140px"
+    return "160px" // Large screens
+  }
 
   const containerVariants = {
     initial: { opacity: 0 },
@@ -70,7 +246,7 @@ const HeroSection = () => {
       opacity: 1,
       transition: { duration: 1, staggerChildren: 0.3 },
     },
-  };
+  }
 
   const titleVariants = {
     initial: { y: 100, opacity: 0 },
@@ -79,16 +255,17 @@ const HeroSection = () => {
       opacity: 1,
       transition: { duration: 1, ease: "easeOut" },
     },
-  };
+  }
 
   const subtitleVariants = {
-    initial: { x: -100, opacity: 0 },
+    initial: { x: -100, opacity: 0, scale: 0.8 },
     animate: {
       x: 0,
       opacity: 1,
-      transition: { duration: 1, ease: "easeOut", delay: 0.3 },
+      scale: 1,
+      transition: { duration: 1.2, ease: "easeOut", delay: 0.3 },
     },
-  };
+  }
 
   const descriptionVariants = {
     initial: { y: 50, opacity: 0 },
@@ -97,7 +274,7 @@ const HeroSection = () => {
       opacity: 1,
       transition: { duration: 1, ease: "easeOut", delay: 0.6 },
     },
-  };
+  }
 
   const buttonVariants = {
     initial: { scale: 0, opacity: 0 },
@@ -108,70 +285,178 @@ const HeroSection = () => {
     },
     hover: {
       scale: 1.05,
-      boxShadow: `0 12px 48px rgba(255, 69, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2)`,
-      background: 'linear-gradient(135deg, rgba(255, 69, 0, 0.2) 0%, rgba(255, 101, 0, 0.3) 50%, rgba(255, 69, 0, 0.2) 100%)',
-      borderColor: '#FF6500',
+      boxShadow: `0 12px 48px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2)`,
+      background: black,
+      color: "white",
+      borderColor: black,
       transition: { duration: 0.3 },
     },
-  };
+  }
 
-  // Audio visualizer bars
+  // Audio visualizer bars with realistic music-responsive animation
   const generateVisualizerBars = (count) =>
-    [...Array(count)].map((_, i) => (
-      <motion.div
-        key={i}
-        animate={{
-          height: [10, Math.random() * 80 + 20, 10],
-          backgroundColor: [flashingOrange, '#FF6500', '#FF8C00', flashingOrange],
-        }}
-        transition={{
-          duration: 0.5 + Math.random() * 0.8,
-          repeat: Infinity,
-          ease: "easeInOut",
-          delay: i * 0.05,
-        }}
-        style={{
-          width: '4px',
-          backgroundColor: flashingOrange,
-          borderRadius: '2px',
-          opacity: 0.8,
-          margin: '0 1px',
-        }}
-      />
-    ));
+    [...Array(count)].map((_, i) => {
+      // Create more realistic music visualization patterns
+      const baseHeight = isPlaying ? 15 : 8
+      const maxHeight = isPlaying ? 80 + Math.sin(currentTime * 0.1 + i) * 20 : 15
+      const animationSpeed = isPlaying ? 0.3 + Math.random() * 0.4 : 2
+
+      return (
+        <motion.div
+          key={i}
+          animate={{
+            height: isPlaying
+              ? [baseHeight, maxHeight * (0.3 + Math.random() * 0.7), baseHeight]
+              : [baseHeight, baseHeight + Math.random() * 5, baseHeight],
+            backgroundColor: isPlaying
+              ? [flashingOrange, "#FF6500", "#FF8C00", flashingOrange]
+              : ["rgba(255, 69, 0, 0.3)", "rgba(255, 69, 0, 0.5)", "rgba(255, 69, 0, 0.3)"],
+            opacity: isPlaying ? [0.8, 1, 0.8] : [0.3, 0.5, 0.3],
+          }}
+          transition={{
+            duration: animationSpeed,
+            repeat: Number.POSITIVE_INFINITY,
+            ease: "easeInOut",
+            delay: i * 0.05,
+          }}
+          style={{
+            width: isXSmall ? "3px" : isMobile ? "4px" : "5px",
+            backgroundColor: flashingOrange,
+            borderRadius: "2px",
+            opacity: 0.8,
+            margin: "0 1px",
+          }}
+        />
+      )
+    })
 
   const formatTime = (seconds) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
+    const mins = Math.floor(seconds / 60)
+    const secs = seconds % 60
+    return `${mins}:${secs.toString().padStart(2, "0")}`
+  }
+
+  const handlePlayPause = async () => {
+    if (!audioRef.current) return
+
+    const audio = audioRef.current
+
+    if (isPlaying) {
+      audio.pause()
+      setIsPlaying(false)
+    } else {
+      try {
+        await audio.play()
+        setIsPlaying(true)
+      } catch (error) {
+        console.warn("Playback failed:", error)
+        setIsPlaying(false)
+
+        // For demo purposes, simulate playback if real audio fails
+        if (error.name === "NotSupportedError" || error.name === "NotAllowedError") {
+          // Simulate audio playback
+          setIsPlaying(true)
+          const simulateProgress = () => {
+            setCurrentTime((prev) => {
+              const next = prev + 1
+              if (next >= (duration || musicTracks[currentTrack].duration)) {
+                setIsPlaying(false)
+                return 0
+              }
+              return next
+            })
+          }
+
+          const interval = setInterval(simulateProgress, 1000)
+
+          // Clean up simulation when paused
+          const cleanup = () => {
+            clearInterval(interval)
+            audio.removeEventListener("pause", cleanup)
+          }
+          audio.addEventListener("pause", cleanup)
+        }
+      }
+    }
+  }
+
+  const skipToNextTrack = () => {
+    const nextIndex = (currentTrack + 1) % musicTracks.length
+    setCurrentTrack(nextIndex)
+  }
+
+  const skipToPrevTrack = () => {
+    const prevIndex = currentTrack === 0 ? musicTracks.length - 1 : currentTrack - 1
+    setCurrentTrack(prevIndex)
+  }
+
+  const handleProgressClick = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect()
+    const clickX = e.clientX - rect.left
+    const trackDuration = duration || musicTracks[currentTrack].duration
+    const newTime = Math.floor((clickX / rect.width) * trackDuration)
+
+    setCurrentTime(newTime)
+
+    if (audioRef.current && !isNaN(audioRef.current.duration)) {
+      audioRef.current.currentTime = newTime
+    }
+  }
+
+  const handleVolumeClick = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect()
+    const clickX = e.clientX - rect.left
+    const newVolume = Math.floor((clickX / rect.width) * 100)
+    setVolume(Math.max(0, Math.min(100, newVolume)))
+  }
+
+  const currentTrackInfo = musicTracks[currentTrack]
+  const trackDuration = duration || currentTrackInfo.duration
 
   return (
     <div
       style={{
-        position: 'relative',
-        minHeight: '100vh',
-        width: '100vw',
+        position: "relative",
+        minHeight: "100vh",
+        width: "100vw",
         margin: 0,
         padding: 0,
-        overflow: 'hidden',
-        background: heroSlides[currentSlide].bg,
-        transition: 'background 2s ease-in-out',
+        overflow: "hidden",
+        backgroundImage: 'url("/Bg-Tab.jpeg")',
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+        backgroundAttachment: "fixed",
       }}
     >
-      {/* Animated Background Particles */}
+      {/* Background Overlay */}
       <div
         style={{
-          position: 'absolute',
+          position: "absolute",
           top: 0,
           left: 0,
           right: 0,
           bottom: 0,
-          overflow: 'hidden',
-          pointerEvents: 'none',
+          background: heroSlides[currentSlide].bg,
+          transition: "background 2s ease-in-out",
+          zIndex: 1,
+        }}
+      />
+
+      {/* Animated Background Particles */}
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          overflow: "hidden",
+          pointerEvents: "none",
+          zIndex: 2,
         }}
       >
-        {[...Array(50)].map((_, i) => (
+        {[...Array(isXSmall ? 20 : isSmall ? 35 : 50)].map((_, i) => (
           <motion.div
             key={i}
             animate={{
@@ -181,19 +466,19 @@ const HeroSection = () => {
             }}
             transition={{
               duration: 3 + Math.random() * 4,
-              repeat: Infinity,
+              repeat: Number.POSITIVE_INFINITY,
               delay: Math.random() * 5,
               ease: "easeInOut",
             }}
             style={{
-              position: 'absolute',
+              position: "absolute",
               left: `${Math.random() * 100}%`,
-              top: '100%',
-              width: '2px',
-              height: '2px',
+              top: "100%",
+              width: isXSmall ? "1px" : "2px",
+              height: isXSmall ? "1px" : "2px",
               backgroundColor: flashingOrange,
-              borderRadius: '50%',
-              boxShadow: `0 0 10px ${flashingOrange}`,
+              borderRadius: "50%",
+              boxShadow: `0 0 ${isXSmall ? "5px" : "10px"} ${flashingOrange}`,
             }}
           />
         ))}
@@ -205,49 +490,50 @@ const HeroSection = () => {
         initial="initial"
         animate="animate"
         style={{
-          position: 'relative',
-          zIndex: 2,
-          minHeight: '100vh',
-          width: '100%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: isXSmall ? '0 1rem' : isMobile ? '0 1.5rem' : '0 2rem',
-          paddingTop: isXSmall ? '100px' : isMobile ? '120px' : '140px', // Added top padding to move content down
-          textAlign: 'center',
+          position: "relative",
+          zIndex: 3,
+          minHeight: "100vh",
+          width: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: isXSmall ? "0 1rem" : isSmall ? "0 1.5rem" : isMobile ? "0 2rem" : "0 3rem",
+          paddingTop: getTopPadding(),
+          textAlign: "center",
         }}
       >
-        <div style={{ maxWidth: isTablet ? '90%' : '1200px', width: '100%' }}>
+        <div
+          style={{
+            maxWidth: isTablet ? "95%" : "1200px",
+            width: "100%",
+          }}
+        >
           {/* Slide Content */}
-          <div style={{ 
-            display: 'flex', 
-            flexDirection: 'column', 
-            alignItems: 'center',
-            maxWidth: '900px',
-            margin: '0 auto'
-          }}>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              maxWidth: isXSmall ? "100%" : "900px",
+              margin: "0 auto",
+            }}
+          >
             <motion.h1
               key={`title-${currentSlide}`}
               variants={titleVariants}
               initial="initial"
               animate="animate"
               style={{
-                fontSize: isXSmall
-                  ? '2.2rem'
-                  : isMobile
-                  ? '3rem'
-                  : isTablet
-                  ? '4.5rem'
-                  : 'clamp(3rem, 7vw, 7rem)',
-                fontWeight: '700',
-                color: 'white',
-                margin: '0 0 0.8rem 0',
+                fontSize: getTitleFontSize(),
+                fontWeight: "700",
+                color: "white",
+                margin: "0 0 1rem 0",
                 textShadow: `0 0 30px ${flashingOrange}, 0 0 60px rgba(255, 69, 0, 0.3)`,
-                fontFamily: '"Orbitron", monospace, system-ui',
-                letterSpacing: '3px',
-                textTransform: 'uppercase',
-                lineHeight: '1.0',
-                textAlign: 'center',
+                fontFamily: "system-ui, -apple-system, sans-serif",
+                letterSpacing: isXSmall ? "2px" : "4px",
+                textTransform: "uppercase",
+                lineHeight: "1.0",
+                textAlign: "center",
               }}
             >
               {heroSlides[currentSlide].title}
@@ -259,21 +545,18 @@ const HeroSection = () => {
               initial="initial"
               animate="animate"
               style={{
-                fontSize: isXSmall
-                  ? '1.4rem'
-                  : isMobile
-                  ? '1.8rem'
-                  : isTablet
-                  ? '2.5rem'
-                  : 'clamp(1.8rem, 4vw, 3.5rem)',
-                fontWeight: '300',
-                color: flashingOrange,
-                margin: '0 0 1.5rem 0',
-                textShadow: `0 0 20px ${flashingOrange}`,
-                letterSpacing: '4px',
-                textTransform: 'uppercase',
-                lineHeight: '1.1',
-                textAlign: 'center',
+                fontSize: getSubtitleFontSize(),
+                fontWeight: "900", // Extra bold for "Innovation"
+                color: black, // Changed to black
+                margin: "0 0 2rem 0",
+                textShadow: `0 4px 20px rgba(0, 0, 0, 0.5), 0 0 40px rgba(0, 0, 0, 0.3)`, // Black shadows
+                letterSpacing: isXSmall ? "3px" : "6px",
+                textTransform: "uppercase",
+                lineHeight: "0.9",
+                textAlign: "center",
+                fontFamily: "system-ui, -apple-system, sans-serif",
+                // Removed gradient background and WebkitTextFillColor
+                filter: "drop-shadow(0 0 10px rgba(0, 0, 0, 0.5))", // Black drop shadow
               }}
             >
               {heroSlides[currentSlide].subtitle}
@@ -285,18 +568,15 @@ const HeroSection = () => {
               initial="initial"
               animate="animate"
               style={{
-                fontSize: isXSmall
-                  ? '1rem'
-                  : isMobile
-                  ? '1.2rem'
-                  : 'clamp(1.2rem, 2.2vw, 1.6rem)',
-                color: 'rgba(255, 255, 255, 0.85)',
-                margin: '0 0 2.5rem 0',
-                maxWidth: isXSmall ? '95%' : '700px',
-                lineHeight: '1.5',
-                fontWeight: '300',
-                textAlign: 'center',
-                letterSpacing: '0.5px',
+                fontSize: getDescriptionFontSize(),
+                color: "rgba(255, 255, 255, 0.9)",
+                margin: "0 0 3rem 0",
+                maxWidth: isXSmall ? "100%" : isSmall ? "95%" : "700px",
+                lineHeight: "1.6",
+                fontWeight: "300",
+                textAlign: "center",
+                letterSpacing: "0.5px",
+                fontFamily: "system-ui, -apple-system, sans-serif",
               }}
             >
               {heroSlides[currentSlide].description}
@@ -310,37 +590,38 @@ const HeroSection = () => {
               whileHover="hover"
               whileTap={{ scale: 0.95 }}
               style={{
-                padding: isXSmall ? '0.8rem 2.5rem' : '1rem 3rem',
-                fontSize: isXSmall ? '1rem' : '1.2rem',
-                fontWeight: '600',
-                color: 'white',
-                background: 'linear-gradient(135deg, rgba(255, 69, 0, 0.1) 0%, rgba(255, 101, 0, 0.2) 50%, rgba(255, 69, 0, 0.1) 100%)',
-                border: `2px solid ${flashingOrange}`,
-                borderRadius: '50px',
-                cursor: 'pointer',
-                textTransform: 'uppercase',
-                letterSpacing: '2px',
-                boxShadow: `0 8px 32px rgba(255, 69, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1)`,
-                position: 'relative',
-                overflow: 'hidden',
-                marginTop: isXSmall ? '2rem' : '2.5rem',
-                backdropFilter: 'blur(10px)',
-                transition: 'all 0.3s ease',
+                padding: getButtonPadding(),
+                fontSize: getButtonFontSize(),
+                fontWeight: "600",
+                color: black,
+                background: "transparent",
+                border: `2px solid ${black}`,
+                borderRadius: "50px",
+                cursor: "pointer",
+                textTransform: "uppercase",
+                letterSpacing: isXSmall ? "1px" : "2px",
+                boxShadow: `0 8px 32px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1)`,
+                position: "relative",
+                overflow: "hidden",
+                marginTop: isXSmall ? "2rem" : "2.5rem",
+                backdropFilter: "blur(10px)",
+                transition: "all 0.3s ease",
+                fontFamily: "system-ui, -apple-system, sans-serif",
               }}
               aria-label="Get Started with SignSound Studio"
             >
               <div
                 style={{
-                  position: 'absolute',
+                  position: "absolute",
                   top: 0,
-                  left: '-100%',
-                  width: '100%',
-                  height: '100%',
-                  background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent)',
-                  transition: 'left 0.6s ease',
+                  left: "-100%",
+                  width: "100%",
+                  height: "100%",
+                  background: "linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent)",
+                  transition: "left 0.6s ease",
                 }}
               />
-              <span style={{ position: 'relative', zIndex: 1 }}>Get Started</span>
+              <span style={{ position: "relative", zIndex: 1 }}>Get Started</span>
             </motion.button>
           </div>
 
@@ -350,12 +631,12 @@ const HeroSection = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1.2, duration: 0.8 }}
             style={{
-              background: 'rgba(0, 0, 0, 0.8)',
-              backdropFilter: 'blur(20px)',
-              borderRadius: '20px',
-              padding: isXSmall ? '1.2rem' : '1.5rem', // Reduced padding
-              margin: isXSmall ? '1.5rem auto' : '2rem auto', // Reduced margin
-              maxWidth: isXSmall ? '90%' : '600px',
+              background: "rgba(0, 0, 0, 0.8)",
+              backdropFilter: "blur(20px)",
+              borderRadius: isXSmall ? "15px" : "20px",
+              padding: isXSmall ? "1.2rem" : isSmall ? "1.5rem" : "2rem",
+              margin: isXSmall ? "2rem auto" : "3rem auto",
+              maxWidth: isXSmall ? "95%" : isSmall ? "90%" : "700px",
               border: `2px solid rgba(255, 69, 0, 0.3)`,
               boxShadow: `0 10px 40px rgba(255, 69, 0, 0.2)`,
             }}
@@ -363,85 +644,141 @@ const HeroSection = () => {
             {/* Audio Visualizer */}
             <div
               style={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'flex-end',
-                height: isXSmall ? '70px' : '80px', // Reduced height
-                marginBottom: '1.5rem', // Reduced margin
-                gap: '1px',
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "flex-end",
+                height: isXSmall ? "70px" : isSmall ? "80px" : "100px",
+                marginBottom: isXSmall ? "1.5rem" : "2rem",
+                gap: "1px",
               }}
             >
-              {generateVisualizerBars(isXSmall ? 30 : 40)}
+              {generateVisualizerBars(isXSmall ? 30 : isSmall ? 40 : 50)}
             </div>
 
             {/* Player Controls */}
             <div
               style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                marginBottom: '1rem',
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                marginBottom: "1.5rem",
+                flexWrap: isXSmall ? "wrap" : "nowrap",
+                gap: isXSmall ? "1rem" : "1.5rem",
               }}
             >
+              {/* Previous Track Button */}
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={skipToPrevTrack}
+                style={{
+                  width: isXSmall ? "40px" : "45px",
+                  height: isXSmall ? "40px" : "45px",
+                  borderRadius: "50%",
+                  border: `2px solid ${flashingOrange}`,
+                  background: "transparent",
+                  color: flashingOrange,
+                  cursor: "pointer",
+                  fontSize: isXSmall ? "1rem" : "1.2rem",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  transition: "all 0.3s ease",
+                }}
+                aria-label="Previous track"
+              >
+                ⏮️
+              </motion.button>
+
               {/* Play/Pause Button */}
               <motion.button
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
-                onClick={() => setIsPlaying(!isPlaying)}
+                onClick={handlePlayPause}
+                disabled={isLoading}
                 style={{
-                  width: isXSmall ? '50px' : '60px',
-                  height: isXSmall ? '50px' : '60px',
-                  borderRadius: '50%',
+                  width: isXSmall ? "55px" : isSmall ? "65px" : "75px",
+                  height: isXSmall ? "55px" : isSmall ? "65px" : "75px",
+                  borderRadius: "50%",
                   border: `3px solid ${flashingOrange}`,
-                  background: isPlaying ? flashingOrange : 'transparent',
-                  color: isPlaying ? 'black' : flashingOrange,
-                  cursor: 'pointer',
-                  fontSize: isXSmall ? '1.2rem' : '1.5rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  transition: 'all 0.3s ease',
+                  background: isPlaying ? flashingOrange : "transparent",
+                  color: isPlaying ? "black" : flashingOrange,
+                  cursor: isLoading ? "not-allowed" : "pointer",
+                  fontSize: isXSmall ? "1.5rem" : isSmall ? "1.8rem" : "2rem",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  transition: "all 0.3s ease",
+                  opacity: isLoading ? 0.6 : 1,
                 }}
-                aria-label={isPlaying ? 'Pause audio' : 'Play audio'}
+                aria-label={isPlaying ? "Pause audio" : "Play audio"}
               >
-                {isPlaying ? '⏸️' : '▶️'}
+                {isLoading ? "⏳" : isPlaying ? "⏸️" : "▶️"}
+              </motion.button>
+
+              {/* Next Track Button */}
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={skipToNextTrack}
+                style={{
+                  width: isXSmall ? "40px" : "45px",
+                  height: isXSmall ? "40px" : "45px",
+                  borderRadius: "50%",
+                  border: `2px solid ${flashingOrange}`,
+                  background: "transparent",
+                  color: flashingOrange,
+                  cursor: "pointer",
+                  fontSize: isXSmall ? "1rem" : "1.2rem",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  transition: "all 0.3s ease",
+                }}
+                aria-label="Next track"
+              >
+                ⏭️
               </motion.button>
 
               {/* Time Progress */}
               <div
                 style={{
                   flex: 1,
-                  margin: isXSmall ? '0 1rem' : '0 2rem',
-                  color: 'white',
+                  margin: isXSmall ? "1rem 0" : "0 1.5rem",
+                  color: "white",
+                  minWidth: isXSmall ? "100%" : "auto",
+                  order: isXSmall ? 1 : 0,
                 }}
               >
                 <div
                   style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    fontSize: isXSmall ? '0.8rem' : '0.9rem',
-                    marginBottom: '0.5rem',
+                    display: "flex",
+                    justifyContent: "space-between",
+                    fontSize: isXSmall ? "0.8rem" : "1rem",
+                    marginBottom: "0.8rem",
                   }}
                 >
                   <span>{formatTime(currentTime)}</span>
-                  <span>3:00</span>
+                  <span>{formatTime(trackDuration)}</span>
                 </div>
                 <div
                   style={{
-                    height: '4px',
-                    background: 'rgba(255, 255, 255, 0.2)',
-                    borderRadius: '2px',
-                    overflow: 'hidden',
+                    height: "6px",
+                    background: "rgba(255, 255, 255, 0.2)",
+                    borderRadius: "3px",
+                    overflow: "hidden",
+                    cursor: "pointer",
                   }}
+                  onClick={handleProgressClick}
                 >
                   <motion.div
                     animate={{
-                      width: `${(currentTime / 180) * 100}%`,
+                      width: `${(currentTime / trackDuration) * 100}%`,
                     }}
                     style={{
-                      height: '100%',
+                      height: "100%",
                       background: `linear-gradient(90deg, ${flashingOrange}, #FF6500)`,
-                      borderRadius: '2px',
+                      borderRadius: "3px",
                     }}
                   />
                 </div>
@@ -450,29 +787,32 @@ const HeroSection = () => {
               {/* Volume Control */}
               <div
                 style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '10px',
+                  display: "flex",
+                  alignItems: "center",
+                  gap: isXSmall ? "8px" : "12px",
                   color: flashingOrange,
                 }}
               >
-                <span style={{ fontSize: isXSmall ? '1rem' : '1.2rem' }}>🔊</span>
+                <span style={{ fontSize: isXSmall ? "1.2rem" : "1.5rem" }}>
+                  {volume === 0 ? "🔇" : volume < 50 ? "🔉" : "🔊"}
+                </span>
                 <div
                   style={{
-                    width: isXSmall ? '60px' : '80px',
-                    height: '4px',
-                    background: 'rgba(255, 255, 255, 0.2)',
-                    borderRadius: '2px',
-                    position: 'relative',
-                    cursor: 'pointer',
+                    width: isXSmall ? "60px" : isSmall ? "80px" : "100px",
+                    height: "6px",
+                    background: "rgba(255, 255, 255, 0.2)",
+                    borderRadius: "3px",
+                    position: "relative",
+                    cursor: "pointer",
                   }}
+                  onClick={handleVolumeClick}
                 >
                   <div
                     style={{
                       width: `${volume}%`,
-                      height: '100%',
+                      height: "100%",
                       background: flashingOrange,
-                      borderRadius: '2px',
+                      borderRadius: "3px",
                     }}
                   />
                 </div>
@@ -482,27 +822,29 @@ const HeroSection = () => {
             {/* Track Info */}
             <div
               style={{
-                textAlign: 'center',
-                color: 'white',
+                textAlign: "center",
+                color: "white",
               }}
             >
               <div
                 style={{
-                  fontSize: isXSmall ? '0.9rem' : '1.1rem',
-                  fontWeight: 'bold',
-                  marginBottom: '0.5rem',
+                  fontSize: isXSmall ? "1rem" : isSmall ? "1.2rem" : "1.4rem",
+                  fontWeight: "bold",
+                  marginBottom: "0.5rem",
+                  fontFamily: "system-ui, -apple-system, sans-serif",
                 }}
               >
-                Demo Track - Professional Mix
+                {currentTrackInfo.name}
               </div>
               <div
                 style={{
-                  fontSize: isXSmall ? '0.7rem' : '0.9rem',
+                  fontSize: isXSmall ? "0.8rem" : isSmall ? "0.9rem" : "1rem",
                   color: flashingOrange,
                   opacity: 0.8,
+                  fontFamily: "system-ui, -apple-system, sans-serif",
                 }}
               >
-                SoundWave Studios
+                {currentTrackInfo.artist}
               </div>
             </div>
           </motion.div>
@@ -512,13 +854,13 @@ const HeroSection = () => {
       {/* Slide Indicators */}
       <div
         style={{
-          position: 'absolute',
-          bottom: '2rem',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          display: 'flex',
-          gap: '1rem',
-          zIndex: 3,
+          position: "absolute",
+          bottom: isXSmall ? "2rem" : "2.5rem",
+          left: "50%",
+          transform: "translateX(-50%)",
+          display: "flex",
+          gap: isXSmall ? "0.8rem" : "1rem",
+          zIndex: 4,
         }}
       >
         {heroSlides.map((_, index) => (
@@ -527,13 +869,13 @@ const HeroSection = () => {
             whileHover={{ scale: 1.2 }}
             onClick={() => setCurrentSlide(index)}
             style={{
-              width: '12px',
-              height: '12px',
-              borderRadius: '50%',
+              width: isXSmall ? "12px" : "15px",
+              height: isXSmall ? "12px" : "15px",
+              borderRadius: "50%",
               border: `2px solid ${flashingOrange}`,
-              background: index === currentSlide ? flashingOrange : 'transparent',
-              cursor: 'pointer',
-              transition: 'all 0.3s ease',
+              background: index === currentSlide ? flashingOrange : "transparent",
+              cursor: "pointer",
+              transition: "all 0.3s ease",
             }}
             aria-label={`Go to slide ${index + 1}`}
           />
@@ -543,27 +885,27 @@ const HeroSection = () => {
       {/* Scroll Indicator */}
       <motion.div
         animate={{
-          y: [0, 10, 0],
+          y: [0, 15, 0],
           opacity: [0.5, 1, 0.5],
         }}
         transition={{
           duration: 2,
-          repeat: Infinity,
-          ease: 'easeInOut',
+          repeat: Number.POSITIVE_INFINITY,
+          ease: "easeInOut",
         }}
         style={{
-          position: 'absolute',
-          bottom: '1rem',
-          right: isXSmall ? '1rem' : '2rem',
+          position: "absolute",
+          bottom: isXSmall ? "1rem" : "1.5rem",
+          right: isXSmall ? "1.5rem" : "2rem",
           color: flashingOrange,
-          fontSize: isXSmall ? '1.5rem' : '2rem',
-          zIndex: 3,
+          fontSize: isXSmall ? "1.5rem" : isSmall ? "2rem" : "2.5rem",
+          zIndex: 4,
         }}
       >
         ↓
       </motion.div>
     </div>
-  );
-};
+  )
+}
 
-export default HeroSection;
+export default HeroSection

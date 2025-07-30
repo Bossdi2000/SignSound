@@ -32,8 +32,8 @@ const Footer = () => {
   }, []);
 
   const isXSmall = windowSize.width < 480;
-  const isMobile = windowSize.width >= 480 && windowSize.width < 640;
-  const isTablet = windowSize.width >= 640 && windowSize.width < 1024;
+  const isMobile = windowSize.width >= 480 && windowSize.width < 768;
+  const isTablet = windowSize.width >= 768 && windowSize.width < 1024;
   const isDesktop = windowSize.width >= 1024;
 
   // Colors
@@ -78,7 +78,7 @@ const Footer = () => {
       ref={ref}
       style={{
         background: `linear-gradient(180deg, ${darkGray} 0%, ${black} 50%, ${darkGray} 100%)`,
-        padding: isXSmall ? '2rem 1rem' : isMobile ? '3rem 1.5rem' : '4rem 2rem',
+        padding: isXSmall ? '2rem 1rem' : isMobile ? '2.5rem 1.5rem' : isTablet ? '3rem 2rem' : '4rem 2rem',
         position: 'relative',
         overflow: 'hidden',
         color: 'white',
@@ -95,9 +95,10 @@ const Footer = () => {
           bottom: 0,
           opacity: 0.1,
           pointerEvents: 'none',
+          willChange: 'transform, opacity',
         }}
       >
-        {[...Array(10)].map((_, i) => (
+        {[...Array(isXSmall || isMobile ? 5 : 10)].map((_, i) => (
           <motion.div
             key={i}
             animate={{
@@ -115,8 +116,8 @@ const Footer = () => {
               position: 'absolute',
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
-              width: isXSmall ? '30px' : '50px',
-              height: isXSmall ? '30px' : '50px',
+              width: isXSmall ? '20px' : isMobile ? '30px' : '50px',
+              height: isXSmall ? '20px' : isMobile ? '30px' : '50px',
               border: `2px solid ${flashingOrange}`,
               borderRadius: '50%',
               transform: 'rotate(45deg)',
@@ -130,7 +131,7 @@ const Footer = () => {
         initial="hidden"
         animate={isInView ? 'visible' : 'hidden'}
         style={{
-          maxWidth: isDesktop ? '1400px' : '90%',
+          maxWidth: isDesktop ? '1400px' : isTablet ? '90%' : '95%',
           margin: '0 auto',
           position: 'relative',
           zIndex: 2,
@@ -140,9 +141,9 @@ const Footer = () => {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: isXSmall || isMobile ? '1fr' : isTablet ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)',
-            gap: isXSmall ? '1.5rem' : isMobile ? '2rem' : '3rem',
-            marginBottom: isXSmall ? '1.5rem' : '2rem',
+            gridTemplateColumns: isXSmall || isMobile ? '1fr' : isTablet ? 'repeat(2, minmax(0, 1fr))' : 'repeat(3, minmax(0, 1fr))',
+            gap: isXSmall ? '1rem' : isMobile ? '1.5rem' : '2rem',
+            marginBottom: isXSmall ? '1rem' : '1.5rem',
           }}
         >
           {/* Logo and About */}
@@ -151,15 +152,15 @@ const Footer = () => {
               variants={logoVariants}
               whileHover="hover"
               style={{
-                width: isXSmall ? '80px' : isMobile ? '100px' : '120px',
-                height: isXSmall ? '80px' : isMobile ? '100px' : '120px',
-                margin: isXSmall || isMobile ? '0 auto 1rem' : '0 0 1rem',
+                width: isXSmall ? '60px' : isMobile ? '80px' : isTablet ? '100px' : '120px',
+                height: isXSmall ? '60px' : isMobile ? '80px' : isTablet ? '100px' : '120px',
+                margin: isXSmall || isMobile ? '0 auto 0.75rem' : '0 0 1rem',
                 filter: `drop-shadow(0 0 20px ${flashingOrange})`,
               }}
             >
               <img
                 src="/logo.svg"
-                alt="Company Logo"
+                alt="AudioVibe Studio Logo"
                 style={{
                   width: '100%',
                   height: '100%',
@@ -171,7 +172,7 @@ const Footer = () => {
             </motion.div>
             <h3
               style={{
-                fontSize: isXSmall ? '1.2rem' : isMobile ? '1.5rem' : '1.8rem',
+                fontSize: isXSmall ? '1.1rem' : isMobile ? '1.3rem' : '1.6rem',
                 fontWeight: 'bold',
                 color: 'white',
                 marginBottom: '0.5rem',
@@ -182,9 +183,10 @@ const Footer = () => {
             </h3>
             <p
               style={{
-                fontSize: isXSmall ? '0.8rem' : '1rem',
+                fontSize: isXSmall ? '0.75rem' : isMobile ? '0.9rem' : '1rem',
                 color: 'rgba(255, 255, 255, 0.8)',
-                lineHeight: '1.5',
+                lineHeight: '1.6',
+                maxWidth: isDesktop ? '300px' : '100%',
               }}
             >
               Crafting immersive audio experiences with passion and precision.
@@ -195,7 +197,7 @@ const Footer = () => {
           <motion.div variants={itemVariants} style={{ textAlign: isXSmall || isMobile ? 'center' : 'left' }}>
             <h3
               style={{
-                fontSize: isXSmall ? '1rem' : isMobile ? '1.2rem' : '1.5rem',
+                fontSize: isXSmall ? '0.9rem' : isMobile ? '1.1rem' : '1.4rem',
                 fontWeight: 'bold',
                 color: flashingOrange,
                 marginBottom: '0.5rem',
@@ -211,7 +213,8 @@ const Footer = () => {
                   padding: 0,
                   display: 'flex',
                   flexDirection: isXSmall || isMobile ? 'column' : 'row',
-                  gap: isXSmall ? '0.5rem' : '1rem',
+                  gap: isXSmall ? '0.5rem' : isMobile ? '0.75rem' : '1rem',
+                  flexWrap: 'wrap',
                 }}
               >
                 {[
@@ -226,7 +229,7 @@ const Footer = () => {
                       href={link.href}
                       whileHover={{ scale: 1.05, color: flashingOrange }}
                       style={{
-                        fontSize: isXSmall ? '0.8rem' : '1rem',
+                        fontSize: isXSmall ? '0.75rem' : isMobile ? '0.9rem' : '1rem',
                         color: 'rgba(255, 255, 255, 0.8)',
                         textDecoration: 'none',
                         transition: 'all 0.3s ease',
@@ -244,7 +247,7 @@ const Footer = () => {
           <motion.div variants={itemVariants} style={{ textAlign: isXSmall || isMobile ? 'center' : 'left' }}>
             <h3
               style={{
-                fontSize: isXSmall ? '1rem' : isMobile ? '1.2rem' : '1.5rem',
+                fontSize: isXSmall ? '0.9rem' : isMobile ? '1.1rem' : '1.4rem',
                 fontWeight: 'bold',
                 color: flashingOrange,
                 marginBottom: '0.5rem',
@@ -255,23 +258,25 @@ const Footer = () => {
             </h3>
             <p
               style={{
-                fontSize: isXSmall ? '0.8rem' : '1rem',
+                fontSize: isXSmall ? '0.75rem' : isMobile ? '0.9rem' : '1rem',
                 color: 'rgba(255, 255, 255, 0.8)',
                 marginBottom: '1rem',
-                lineHeight: '1.5',
+                lineHeight: '1.6',
               }}
             >
-              Email: <a href="mailto:info@audiovibe.studio" style={{ color: flashingOrange, textDecoration: 'none' }}>
+              Email:{' '}
+              <a href="mailto:info@audiovibe.studio" style={{ color: flashingOrange, textDecoration: 'none' }}>
                 info@audiovibe.studio
               </a>
               <br />
-              Phone: <a href="tel:+1234567890" style={{ color: flashingOrange, textDecoration: 'none' }}>
+              Phone:{' '}
+              <a href="tel:+1234567890" style={{ color: flashingOrange, textDecoration: 'none' }}>
                 +1 (234) 567-890
               </a>
             </p>
             <h4
               style={{
-                fontSize: isXSmall ? '0.9rem' : '1.1rem',
+                fontSize: isXSmall ? '0.85rem' : isMobile ? '1rem' : '1.1rem',
                 fontWeight: '600',
                 color: 'white',
                 marginBottom: '0.5rem',
@@ -287,21 +292,23 @@ const Footer = () => {
               style={{
                 display: 'flex',
                 flexDirection: isXSmall || isMobile ? 'column' : 'row',
-                gap: '0.5rem',
+                gap: isXSmall ? '0.5rem' : '0.75rem',
+                maxWidth: isDesktop ? '400px' : '100%',
               }}
             >
               <input
                 type="email"
                 placeholder="Enter your email"
                 style={{
-                  padding: isXSmall ? '0.5rem' : '0.7rem',
+                  padding: isXSmall ? '0.6rem' : isMobile ? '0.7rem' : '0.8rem',
                   borderRadius: '15px',
                   border: `2px solid ${flashingOrange}`,
                   background: 'transparent',
                   color: 'white',
-                  fontSize: isXSmall ? '0.8rem' : '1rem',
+                  fontSize: isXSmall ? '0.75rem' : isMobile ? '0.9rem' : '1rem',
                   outline: 'none',
                   flexGrow: 1,
+                  minHeight: '44px', // Touch-friendly height
                 }}
                 aria-label="Email for newsletter"
                 required
@@ -311,15 +318,16 @@ const Footer = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 style={{
-                  padding: isXSmall ? '0.5rem 1rem' : '0.7rem 1.5rem',
+                  padding: isXSmall ? '0.6rem 1rem' : isMobile ? '0.7rem 1.25rem' : '0.8rem 1.5rem',
                   borderRadius: '15px',
                   border: `2px solid ${flashingOrange}`,
                   background: 'transparent',
                   color: flashingOrange,
-                  fontSize: isXSmall ? '0.8rem' : '1rem',
+                  fontSize: isXSmall ? '0.75rem' : isMobile ? '0.9rem' : '1rem',
                   fontWeight: 'bold',
                   cursor: 'pointer',
                   transition: 'all 0.3s ease',
+                  minHeight: '44px', // Touch-friendly height
                 }}
                 onMouseEnter={(e) => {
                   e.target.style.background = flashingOrange;
@@ -342,21 +350,21 @@ const Footer = () => {
           style={{
             textAlign: 'center',
             borderTop: `1px solid rgba(255, 69, 0, 0.3)`,
-            paddingTop: '1.5rem',
+            paddingTop: isXSmall ? '1rem' : '1.5rem',
           }}
         >
           <div
             style={{
               display: 'flex',
               justifyContent: 'center',
-              gap: isXSmall ? '0.5rem' : '1rem',
+              gap: isXSmall ? '0.75rem' : isMobile ? '1rem' : '1.5rem',
               marginBottom: '1rem',
             }}
           >
             {[
-              { platform: 'Twitter', href: 'https://twitter.com/audiovibe', icon: '🐦' },
-              { platform: 'Instagram', href: 'https://instagram.com/audiovibe', icon: '📸' },
-              { platform: 'LinkedIn', href: 'https://linkedin.com/company/audiovibe', icon: '💼' },
+              { platform: 'Twitter', href: 'https://twitter.com/audiovibe', icon: '\u1F426' }, // 🐦
+              { platform: 'Instagram', href: 'https://instagram.com/audiovibe', icon: '\u1F4F8' }, // 📸
+              { platform: 'LinkedIn', href: 'https://linkedin.com/company/audiovibe', icon: '\u1F4BC' }, // 💼
             ].map((social, index) => (
               <motion.a
                 key={index}
@@ -366,9 +374,14 @@ const Footer = () => {
                 whileHover={{ scale: 1.2, rotate: [0, 10, -10, 0] }}
                 transition={{ duration: 0.5 }}
                 style={{
-                  fontSize: isXSmall ? '1.2rem' : '1.5rem',
+                  fontSize: isXSmall ? '1.2rem' : isMobile ? '1.4rem' : '1.6rem',
                   color: flashingOrange,
                   textDecoration: 'none',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '44px', // Touch-friendly size
+                  height: '44px',
                 }}
                 aria-label={`Follow us on ${social.platform}`}
               >
@@ -378,8 +391,9 @@ const Footer = () => {
           </div>
           <p
             style={{
-              fontSize: isXSmall ? '0.7rem' : '0.9rem',
+              fontSize: isXSmall ? '0.65rem' : isMobile ? '0.8rem' : '0.9rem',
               color: 'rgba(255, 255, 255, 0.6)',
+              lineHeight: '1.5',
             }}
           >
             &copy; {new Date().getFullYear()} AudioVibe Studio. All rights reserved.
