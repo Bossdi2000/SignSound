@@ -152,22 +152,25 @@ const Footer = () => {
               variants={logoVariants}
               whileHover="hover"
               style={{
-                width: isXSmall ? '60px' : isMobile ? '80px' : isTablet ? '100px' : '120px',
-                height: isXSmall ? '60px' : isMobile ? '80px' : isTablet ? '100px' : '120px',
+                width: isXSmall ? '40px' : isMobile ? '50px' : isTablet ? '60px' : '70px',
+                height: isXSmall ? '40px' : isMobile ? '50px' : isTablet ? '60px' : '70px',
                 margin: isXSmall || isMobile ? '0 auto 0.75rem' : '0 0 1rem',
                 filter: `drop-shadow(0 0 20px ${flashingOrange})`,
+                borderRadius: '12px', // Added border radius
+                overflow: 'hidden', // Ensure image respects border radius
               }}
             >
               <img
-                src="/logo.svg"
+                src="/TABY.jpeg"
                 alt="AudioVibe Studio Logo"
                 style={{
                   width: '100%',
                   height: '100%',
                   objectFit: 'contain',
+                  borderRadius: '12px', // Ensure image itself is rounded
                 }}
                 loading="lazy"
-                onError={(e) => (e.target.src = '/placeholder.svg?height=120&width=120&text=Logo')}
+                onError={(e) => (e.target.src = '/placeholder.svg?height=70&width=70&text=Logo')}
               />
             </motion.div>
             <h3
