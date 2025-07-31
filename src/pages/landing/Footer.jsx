@@ -365,9 +365,9 @@ const Footer = () => {
             }}
           >
             {[
-              { platform: 'Twitter', href: 'https://twitter.com/audiovibe', icon: '\u1F426' }, // 🐦
-              { platform: 'Instagram', href: 'https://instagram.com/audiovibe', icon: '\u1F4F8' }, // 📸
-              { platform: 'LinkedIn', href: 'https://linkedin.com/company/audiovibe', icon: '\u1F4BC' }, // 💼
+              { platform: 'Twitter', href: 'https://x.com/sounddotsign', icon: '\u1F426' }, // 🐦
+              { platform: 'Instagram', href: '$', icon: '\u1F4F8' }, // 📸
+              { platform: 'LinkedIn', href: '$', icon: '\u1F4BC' }, // 💼
             ].map((social, index) => (
               <motion.a
                 key={index}
