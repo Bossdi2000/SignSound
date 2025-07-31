@@ -41,92 +41,71 @@ const TeamSection = () => {
   const teamMembers = [
     {
       id: 1,
-      name: "Marcus Rodriguez",
-      role: "Chief Audio Engineer",
-      specialty: "Rock & Electronic",
-      experience: "15+ Years",
-      image: "/placeholder.svg?height=120&width=120&text=Marcus",
-      bio: "Grammy-nominated engineer with expertise in rock, pop, and electronic music production. Marcus has worked with top-tier artists and brings innovative techniques to every project.",
-      skills: ["Pro Tools Expert", "SSL Console", "Analog Processing", "Spatial Audio"],
-      achievements: [
-        "Grammy Nomination 2023",
-        "50+ Platinum Records",
-        "Abbey Road Certified",
-        "Dolby Atmos Specialist",
+      name: "Tabby",
+      role: "Intern, Talent Manager",
+      image: "/C1.jpg",
+      bio: "Singer Song writer, Voracious reader. Likes to break hearts",
+      skills: [
+        "Singer",
+        "Songwriter",
+        "Voracious Reader",
+        "Creative Writing",
       ],
-      social: { twitter: "@marcusaudio" },
+      social: { twitter: "@Tabbyomodudu" },
     },
     {
       id: 2,
-      name: "Sarah Chen",
-      role: "Mixing Specialist",
-      specialty: "Pop & R&B",
-      experience: "12+ Years",
-      image: "/placeholder.svg?height=120&width=120&text=Sarah",
-      bio: "Award-winning mixing engineer specializing in contemporary pop and R&B. Sarah's innovative approach to vocal processing has defined the sound of modern hits.",
-      skills: ["Vocal Processing", "Digital Mixing", "Auto-Tune Expert", "Creative Effects"],
-      achievements: ["Billboard #1 Engineer", "30+ Gold Records", "TEC Award Winner", "Berklee Alumni"],
-      social: { twitter: "@sarahchenmix" },
+      name: "Bayour",
+      role: "Research and Talent Specialist",
+      image: "/M1.jpg",
+      bio: "Singer, songwriter, song mixing Eng.",
+      skills: ["Singer", "Songwriter", "Song Mixing Engineer", "Audio Production"],
+      social: { twitter: "@heisbayour" },
     },
     {
       id: 3,
-      name: "David Thompson",
-      role: "Mastering Engineer",
-      specialty: "All Genres",
-      experience: "20+ Years",
-      image: "/placeholder.svg?height=120&width=120&text=David",
-      bio: "Veteran mastering engineer with two decades of experience across all genres. David's meticulous attention to detail ensures your tracks sound perfect on any system.",
-      skills: ["Mastering Suite", "Analog EQ", "Loudness Standards", "Vinyl Cutting"],
-      achievements: ["AES Fellow", "100+ Albums Mastered", "Sterling Sound Alumni", "Multiple Genre Expert"],
-      social: { twitter: "@davidmastering" },
+      name: "Prince David",
+      role: "Graphics Designer, Creative Writer",
+      image: "/M2.jpg",
+      bio: "Graphics designer, Singer.",
+      skills: ["Graphics Designer", "Singer", "Creative Writing", "Visual Arts"],
+      social: { twitter: "@CTNg_Prince" },
     },
     {
       id: 4,
-      name: "Luna Martinez",
-      role: "Producer & Songwriter",
-      specialty: "Indie & Alternative",
-      experience: "10+ Years",
-      image: "/placeholder.svg?height=120&width=120&text=Luna",
-      bio: "Creative producer and songwriter with a passion for indie and alternative music. Luna brings fresh perspectives and innovative arrangements to every collaboration.",
-      skills: ["Songwriting", "Arrangement", "Live Recording", "Vintage Gear"],
-      achievements: ["ASCAP Award Winner", "25+ Artist Collaborations", "Indie Chart Success", "Multi-Instrumentalist"],
-      social: { twitter: "@lunaproducer" },
+      name: "Una.signcares",
+      role: "Talent Scout",
+      image: "/M3.jpg",
+      bio: "Singer, songwriter. Graphics designer",
+      skills: ["Singer", "Songwriter", "Graphics Designer", "Talent Scouting"],
+      social: { twitter: "@sia_erick10141" },
     },
     {
       id: 5,
-      name: "Alex Kim",
-      role: "Sound Designer",
-      specialty: "Electronic & Ambient",
-      experience: "8+ Years",
-      image: "/placeholder.svg?height=120&width=120&text=Alex",
-      bio: "Innovative sound designer specializing in electronic music and ambient soundscapes. Alex creates unique sonic textures that push the boundaries of conventional music.",
-      skills: ["Synthesis", "Sound Design", "Modular Systems", "Field Recording"],
-      achievements: ["Film Score Credits", "Synthesizer Expert", "Ambient Pioneer", "Tech Innovation"],
-      social: { twitter: "@alexsounddesign" },
+      name: "Engr Virus",
+      role: "Talent Discovery Host, Community Connector",
+      image: "/M4.jpg",
+      bio: "Singer, Event coordinator",
+      skills: ["Singer", "Event Coordinator", "Community Building", "Talent Discovery"],
+      social: { twitter: "@Engrvirus1" },
     },
     {
       id: 6,
-      name: "Jordan Blake",
-      role: "Recording Engineer",
-      specialty: "Live & Studio",
-      experience: "14+ Years",
-      image: "/placeholder.svg?height=120&width=120&text=Jordan",
-      bio: "Experienced recording engineer with expertise in both live and studio environments. Jordan's technical precision and creative input elevate every recording session.",
-      skills: ["Live Recording", "Microphone Techniques", "Studio Setup", "Remote Recording"],
-      achievements: ["Live Album Specialist", "Concert Recording Pro", "Studio Design", "Technical Innovation"],
-      social: { twitter: "@jordanrecords" },
+      name: "Dyce",
+      role: "Social Media Manager, Creative Director",
+      image: "/M5.jpg",
+      bio: "Singer, rapper, songwriter, Video editor.",
+      skills: ["Singer", "Rapper", "Songwriter", "Video Editor"],
+      social: { twitter: "@DominatorDyce" },
     },
     {
       id: 7,
-      name: "Riley Foster",
-      role: "Audio Post-Production",
-      specialty: "Film & Media",
-      experience: "11+ Years",
-      image: "/placeholder.svg?height=120&width=120&text=Riley",
-      bio: "Specialized audio post-production engineer for film, TV, and digital media. Riley ensures crystal-clear dialogue and immersive soundscapes for visual content.",
-      skills: ["Dialogue Editing", "Foley", "Surround Sound", "Sync Technology"],
-      achievements: ["Emmy Nomination", "Film Festival Awards", "Streaming Platform Work", "ADR Specialist"],
-      social: { twitter: "@rileypostpro" },
+      name: "Cybrox",
+      role: "A&R Representative, Artist Research Director",
+      image: "/M6.jpg",
+      bio: "Singer, rapper, songwriter",
+      skills: ["Singer", "Rapper", "Songwriter", "A&R Research"],
+      social: { twitter: "@ManuelChuk89697" },
     },
   ]
 
@@ -435,39 +414,12 @@ const TeamSection = () => {
                   style={{
                     fontSize: isXSmall ? "0.7rem" : isSmall ? "0.8rem" : "0.9rem",
                     color: flashingOrange,
-                    marginBottom: "0.3rem",
+                    marginBottom: "0.8rem",
                     fontWeight: "600",
                   }}
                 >
                   {member.role}
                 </p>
-                <p
-                  style={{
-                    fontSize: isXSmall ? "0.6rem" : "0.7rem",
-                    color: "rgba(255, 255, 255, 0.7)",
-                    marginBottom: "0.8rem",
-                  }}
-                >
-                  {member.specialty}
-                </p>
-
-                {/* Experience Badge */}
-                <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  style={{
-                    display: "inline-block",
-                    background: `linear-gradient(45deg, ${flashingOrange}, #FF6500)`,
-                    color: "black",
-                    padding: isXSmall ? "0.2rem 0.5rem" : "0.3rem 0.6rem",
-                    borderRadius: "12px",
-                    fontSize: isXSmall ? "0.6rem" : "0.7rem",
-                    fontWeight: "bold",
-                    marginBottom: isXSmall ? "0.8rem" : "1rem",
-                    boxShadow: `0 2px 8px rgba(255, 69, 0, 0.3)`,
-                  }}
-                >
-                  {member.experience}
-                </motion.div>
 
                 {/* Bio Preview */}
                 <p
@@ -489,6 +441,10 @@ const TeamSection = () => {
                 <motion.button
                   whileHover={{ scale: isXSmall ? 1.02 : 1.05 }}
                   whileTap={{ scale: 0.95 }}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setSelectedMember(member)
+                  }}
                   style={{
                     background: "transparent",
                     border: `1px solid ${flashingOrange}`,
@@ -712,20 +668,11 @@ const TeamSection = () => {
                   style={{
                     fontSize: isXSmall ? "0.9rem" : isSmall ? "1rem" : "1.2rem",
                     color: flashingOrange,
-                    marginBottom: "0.5rem",
+                    marginBottom: "1rem",
                     fontWeight: "600",
                   }}
                 >
                   {selectedMember.role}
-                </p>
-                <p
-                  style={{
-                    fontSize: isXSmall ? "0.8rem" : "0.9rem",
-                    color: "rgba(255, 255, 255, 0.7)",
-                    marginBottom: "1rem",
-                  }}
-                >
-                  {selectedMember.specialty} • {selectedMember.experience}
                 </p>
                 <p
                   style={{
@@ -739,7 +686,7 @@ const TeamSection = () => {
                   {selectedMember.bio}
                 </p>
 
-                {/* Achievements */}
+                {/* Skills */}
                 <div
                   style={{
                     marginBottom: "1.5rem",
@@ -755,7 +702,7 @@ const TeamSection = () => {
                       textAlign: "center",
                     }}
                   >
-                    Achievements
+                    Skills
                   </h3>
                   <ul
                     style={{
@@ -766,7 +713,7 @@ const TeamSection = () => {
                       gap: "0.4rem",
                     }}
                   >
-                    {selectedMember.achievements.map((achievement, index) => (
+                    {selectedMember.skills.map((skill, index) => (
                       <li
                         key={index}
                         style={{
@@ -786,52 +733,10 @@ const TeamSection = () => {
                             flexShrink: 0,
                           }}
                         />
-                        {achievement}
+                        {skill}
                       </li>
                     ))}
                   </ul>
-                </div>
-
-                {/* Skills */}
-                <div
-                  style={{
-                    marginBottom: "1.5rem",
-                  }}
-                >
-                  <h3
-                    style={{
-                      fontSize: isXSmall ? "1rem" : "1.1rem",
-                      color: flashingOrange,
-                      marginBottom: "0.5rem",
-                      fontWeight: "600",
-                    }}
-                  >
-                    Skills
-                  </h3>
-                  <div
-                    style={{
-                      display: "flex",
-                      flexWrap: "wrap",
-                      gap: "0.4rem",
-                      justifyContent: "center",
-                    }}
-                  >
-                    {selectedMember.skills.map((skill, index) => (
-                      <span
-                        key={index}
-                        style={{
-                          background: `linear-gradient(45deg, ${flashingOrange}, #FF6500)`,
-                          color: "black",
-                          padding: isXSmall ? "0.2rem 0.5rem" : "0.3rem 0.6rem",
-                          borderRadius: "12px",
-                          fontSize: isXSmall ? "0.6rem" : "0.7rem",
-                          fontWeight: "bold",
-                        }}
-                      >
-                        {skill}
-                      </span>
-                    ))}
-                  </div>
                 </div>
 
                 {/* Twitter Link */}
@@ -853,11 +758,10 @@ const TeamSection = () => {
                       padding: isXSmall ? "0.5rem 1rem" : "0.6rem 1.2rem",
                       borderRadius: "12px",
                       transition: "all 0.3s ease",
-                      display: "inline-block",
-                      minHeight: "40px",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
+                      minHeight: "40px",
                     }}
                     onMouseEnter={(e) => {
                       e.target.style.background = flashingOrange

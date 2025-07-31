@@ -16,6 +16,8 @@ const HeroSection = () => {
 
   // Use useRef for audio element to prevent recreation
   const audioRef = useRef(null)
+  // Add video ref for the background video
+  const videoRef = useRef(null)
 
   // Colors
   const flashingOrange = "#FF4500"
@@ -28,13 +30,7 @@ const HeroSection = () => {
       name: "Chill Vibes",
       duration: 185,
       artist: "SignSound Studios",
-      src: "Odumodu.mp3", // Demo audio
-    },
-    {
-      name: "Urban Beat",
-      duration: 220,
-      artist: "Digital Waves",
-      src: "Wizkid.mp3", // Demo audio
+      src: "Tab.mp3", // Demo audio
     },
   ]
 
@@ -97,6 +93,20 @@ const HeroSection = () => {
     // Set initial track
     if (audio.src !== musicTracks[currentTrack].src) {
       audio.src = musicTracks[currentTrack].src
+    }
+
+    // Video setup - ensure it plays and loops
+    if (videoRef.current) {
+      const video = videoRef.current
+      video.muted = true // Ensure video is muted
+      video.loop = true
+      video.autoplay = true
+      video.playsInline = true // Important for mobile
+      
+      // Try to play the video
+      video.play().catch((error) => {
+        console.warn("Video autoplay failed:", error)
+      })
     }
 
     // Slide interval
@@ -422,13 +432,30 @@ const HeroSection = () => {
         margin: 0,
         padding: 0,
         overflow: "hidden",
-        backgroundImage: 'url("/Bg-Tab.jpeg")',
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat",
-        backgroundAttachment: "fixed",
       }}
     >
+      {/* Background Video */}
+      <video
+        ref={videoRef}
+        autoPlay
+        loop
+        muted
+        playsInline
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+          zIndex: 0,
+        }}
+      >
+        <source src="/VI.mp4" type="video/mp4" />
+        {/* Fallback for browsers that don't support video */}
+        Your browser does not support the video tag.
+      </video>
+
       {/* Background Overlay */}
       <div
         style={{
