@@ -1,254 +1,227 @@
-"use client"
-import { useState, useEffect, useRef } from "react"
-import { motion } from "framer-motion"
+import { useState, useEffect, useRef } from "react";
+import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 const HeroSection = () => {
-  const [currentSlide, setCurrentSlide] = useState(0)
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [volume, setVolume] = useState(75)
-  const [currentTime, setCurrentTime] = useState(0)
-  const [duration, setDuration] = useState(0)
-  const [isLoading, setIsLoading] = useState(false)
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [volume, setVolume] = useState(75);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
   const [windowSize, setWindowSize] = useState({
     width: typeof window !== "undefined" ? window.innerWidth : 1200,
     height: typeof window !== "undefined" ? window.innerHeight : 800,
-  })
+  });
 
-  // Use useRef for audio element to prevent recreation
-  const audioRef = useRef(null)
-  // Add video ref for the background video
-  const videoRef = useRef(null)
+  const audioRef = useRef(null);
+  const videoRef = useRef(null);
+  const navigate = useNavigate();
 
-  // Colors
-  const flashingOrange = "#FF4500"
-  const black = "#000000"
-  const darkGray = "#1a1a1a"
+  const flashingOrange = "#FF4500";
+  const black = "#000000";
+  const darkGray = "#1a1a1a";
 
-  // Music tracks for random selection
   const musicTracks = [
     {
       name: "Chill Vibes",
       duration: 185,
       artist: "SignSound Studios",
-      src: "Tab.mp3", // Demo audio
+      src: "Tab.mp3",
     },
-  ]
+  ];
 
-  const [currentTrack, setCurrentTrack] = useState(0)
+  const [currentTrack, setCurrentTrack] = useState(0);
 
-  // Enhanced responsive breakpoints and audio setup
   useEffect(() => {
-    // Create audio element only once
     if (!audioRef.current) {
-      audioRef.current = new Audio()
-      audioRef.current.preload = "metadata"
-      audioRef.current.volume = volume / 100
+      audioRef.current = new Audio();
+      audioRef.current.preload = "metadata";
+      audioRef.current.volume = volume / 100;
     }
 
-    const audio = audioRef.current
+    const audio = audioRef.current;
 
-    // Audio event listeners
     const handleTimeUpdate = () => {
-      setCurrentTime(Math.floor(audio.currentTime))
-    }
+      setCurrentTime(Math.floor(audio.currentTime));
+    };
 
     const handleLoadedMetadata = () => {
-      setDuration(Math.floor(audio.duration) || musicTracks[currentTrack].duration)
-      setIsLoading(false)
-    }
+      setDuration(Math.floor(audio.duration) || musicTracks[currentTrack].duration);
+      setIsLoading(false);
+    };
 
     const handleLoadStart = () => {
-      setIsLoading(true)
-    }
+      setIsLoading(true);
+    };
 
     const handleCanPlay = () => {
-      setIsLoading(false)
-    }
+      setIsLoading(false);
+    };
 
     const handleEnded = () => {
-      // Auto-advance to next track
-      const nextTrackIndex = (currentTrack + 1) % musicTracks.length
-      setCurrentTrack(nextTrackIndex)
-      setCurrentTime(0)
-      // Don't auto-play next track, let user control
-      setIsPlaying(false)
-    }
+      const nextTrackIndex = (currentTrack + 1) % musicTracks.length;
+      setCurrentTrack(nextTrackIndex);
+      setCurrentTime(0);
+      setIsPlaying(false);
+    };
 
     const handleError = (e) => {
-      console.warn("Audio file not found:", musicTracks[currentTrack].src, "Error:", e)
-      setIsLoading(false)
-      setIsPlaying(false)
-      // Use fallback duration from track info
-      setDuration(musicTracks[currentTrack].duration)
-    }
+      console.warn("Audio file not found:", musicTracks[currentTrack].src, "Error:", e);
+      setIsLoading(false);
+      setIsPlaying(false);
+      setDuration(musicTracks[currentTrack].duration);
+    };
 
-    // Add event listeners
-    audio.addEventListener("timeupdate", handleTimeUpdate)
-    audio.addEventListener("loadedmetadata", handleLoadedMetadata)
-    audio.addEventListener("loadstart", handleLoadStart)
-    audio.addEventListener("canplay", handleCanPlay)
-    audio.addEventListener("ended", handleEnded)
-    audio.addEventListener("error", handleError)
+    audio.addEventListener("timeupdate", handleTimeUpdate);
+    audio.addEventListener("loadedmetadata", handleLoadedMetadata);
+    audio.addEventListener("loadstart", handleLoadStart);
+    audio.addEventListener("canplay", handleCanPlay);
+    audio.addEventListener("ended", handleEnded);
+    audio.addEventListener("error", handleError);
 
-    // Set initial track
     if (audio.src !== musicTracks[currentTrack].src) {
-      audio.src = musicTracks[currentTrack].src
+      audio.src = musicTracks[currentTrack].src;
     }
 
-    // Video setup - ensure it plays and loops
     if (videoRef.current) {
-      const video = videoRef.current
-      video.muted = true // Ensure video is muted
-      video.loop = true
-      video.autoplay = true
-      video.playsInline = true // Important for mobile
-      
-      // Try to play the video
+      const video = videoRef.current;
+      video.muted = true;
+      video.loop = true;
+      video.autoplay = true;
+      video.playsInline = true;
       video.play().catch((error) => {
-        console.warn("Video autoplay failed:", error)
-      })
+        console.warn("Video autoplay failed:", error);
+      });
     }
 
-    // Slide interval
     const slideInterval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % heroSlides.length)
-    }, 5000)
+      setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
+    }, 5000);
 
-    // Window resize handler
     const debounce = (fn, ms) => {
-      let timeout
+      let timeout;
       return (...args) => {
-        clearTimeout(timeout)
-        timeout = setTimeout(() => fn(...args), ms)
-      }
-    }
+        clearTimeout(timeout);
+        timeout = setTimeout(() => fn(...args), ms);
+      };
+    };
 
     const handleResize = debounce(() => {
       setWindowSize({
         width: window.innerWidth,
         height: window.innerHeight,
-      })
-    }, 100)
+      });
+    }, 100);
 
-    window.addEventListener("resize", handleResize)
+    window.addEventListener("resize", handleResize);
 
     return () => {
-      clearInterval(slideInterval)
-      window.removeEventListener("resize", handleResize)
+      clearInterval(slideInterval);
+      window.removeEventListener("resize", handleResize);
+      audio.removeEventListener("timeupdate", handleTimeUpdate);
+      audio.removeEventListener("loadedmetadata", handleLoadedMetadata);
+      audio.removeEventListener("loadstart", handleLoadStart);
+      audio.removeEventListener("canplay", handleCanPlay);
+      audio.removeEventListener("ended", handleEnded);
+      audio.removeEventListener("error", handleError);
+    };
+  }, []);
 
-      // Clean up audio listeners
-      audio.removeEventListener("timeupdate", handleTimeUpdate)
-      audio.removeEventListener("loadedmetadata", handleLoadedMetadata)
-      audio.removeEventListener("loadstart", handleLoadStart)
-      audio.removeEventListener("canplay", handleCanPlay)
-      audio.removeEventListener("ended", handleEnded)
-      audio.removeEventListener("error", handleError)
-    }
-  }, [])
-
-  // Handle track changes
   useEffect(() => {
     if (audioRef.current) {
-      const audio = audioRef.current
-      const wasPlaying = isPlaying
-
-      // Pause current track
-      audio.pause()
-      setIsPlaying(false)
-      setCurrentTime(0)
-      setIsLoading(true)
-
-      // Load new track
-      audio.src = musicTracks[currentTrack].src
-      audio.load()
-
-      // If was playing, resume playback when ready
+      const audio = audioRef.current;
+      const wasPlaying = isPlaying;
+      audio.pause();
+      setIsPlaying(false);
+      setCurrentTime(0);
+      setIsLoading(true);
+      audio.src = musicTracks[currentTrack].src;
+      audio.load();
       if (wasPlaying) {
         const playWhenReady = () => {
           audio
             .play()
             .then(() => {
-              setIsPlaying(true)
+              setIsPlaying(true);
             })
             .catch((e) => {
-              console.warn("Playback failed:", e)
-              setIsPlaying(false)
-            })
-          audio.removeEventListener("canplay", playWhenReady)
-        }
-        audio.addEventListener("canplay", playWhenReady)
+              console.warn("Playback failed:", e);
+              setIsPlaying(false);
+            });
+          audio.removeEventListener("canplay", playWhenReady);
+        };
+        audio.addEventListener("canplay", playWhenReady);
       }
     }
-  }, [currentTrack])
+  }, [currentTrack]);
 
-  // Handle volume changes
   useEffect(() => {
     if (audioRef.current) {
-      audioRef.current.volume = volume / 100
+      audioRef.current.volume = volume / 100;
     }
-  }, [volume])
+  }, [volume]);
 
-  // Enhanced responsive breakpoints
-  const isXSmall = windowSize.width < 375
-  const isSmall = windowSize.width >= 375 && windowSize.width < 640
-  const isMobile = windowSize.width >= 640 && windowSize.width < 768
-  const isTablet = windowSize.width >= 768 && windowSize.width < 1024
-  const isLarge = windowSize.width >= 1024
+  const isXSmall = windowSize.width < 375;
+  const isSmall = windowSize.width >= 375 && windowSize.width < 640;
+  const isMobile = windowSize.width >= 640 && windowSize.width < 768;
+  const isTablet = windowSize.width >= 768 && windowSize.width < 1024;
+  const isLarge = windowSize.width >= 1024;
 
   const heroSlides = [
     {
       title: "Sound Design",
       subtitle: "Innovation",
+      description: "Join SignSound Studios to create groundbreaking audio experiences.",
       bg: "linear-gradient(135deg, rgba(26, 26, 26, 0.7) 0%, rgba(255, 101, 0, 0.6) 50%, rgba(0, 0, 0, 0.8) 100%)",
     },
-  ]
+  ];
 
-  // Enhanced responsive font sizes
   const getTitleFontSize = () => {
-    if (isXSmall) return "2rem"
-    if (isSmall) return "2.5rem"
-    if (isMobile) return "3.5rem"
-    if (isTablet) return "4.5rem"
-    return "6rem" // Large screens
-  }
+    if (isXSmall) return "2rem";
+    if (isSmall) return "2.5rem";
+    if (isMobile) return "3.5rem";
+    if (isTablet) return "4.5rem";
+    return "6rem";
+  };
 
   const getSubtitleFontSize = () => {
-    if (isXSmall) return "2.5rem"
-    if (isSmall) return "3.5rem"
-    if (isMobile) return "4.5rem"
-    if (isTablet) return "6rem"
-    return "8rem" // Large screens - Much bigger for "Innovation"
-  }
+    if (isXSmall) return "2.5rem";
+    if (isSmall) return "3.5rem";
+    if (isMobile) return "4.5rem";
+    if (isTablet) return "6rem";
+    return "8rem";
+  };
 
   const getDescriptionFontSize = () => {
-    if (isXSmall) return "0.9rem"
-    if (isSmall) return "1rem"
-    if (isMobile) return "1.2rem"
-    if (isTablet) return "1.4rem"
-    return "1.6rem" // Large screens
-  }
+    if (isXSmall) return "0.9rem";
+    if (isSmall) return "1rem";
+    if (isMobile) return "1.2rem";
+    if (isTablet) return "1.4rem";
+    return "1.6rem";
+  };
 
   const getButtonFontSize = () => {
-    if (isXSmall) return "0.9rem"
-    if (isSmall) return "1rem"
-    if (isMobile) return "1.1rem"
-    return "1.3rem" // Tablet and above
-  }
+    if (isXSmall) return "0.9rem";
+    if (isSmall) return "1rem";
+    if (isMobile) return "1.1rem";
+    return "1.3rem";
+  };
 
   const getButtonPadding = () => {
-    if (isXSmall) return "0.8rem 2rem"
-    if (isSmall) return "1rem 2.5rem"
-    if (isMobile) return "1.2rem 3rem"
-    return "1.5rem 4rem" // Tablet and above
-  }
+    if (isXSmall) return "0.8rem 2rem";
+    if (isSmall) return "1rem 2.5rem";
+    if (isMobile) return "1.2rem 3rem";
+    return "1.5rem 4rem";
+  };
 
   const getTopPadding = () => {
-    if (isXSmall) return "80px"
-    if (isSmall) return "100px"
-    if (isMobile) return "120px"
-    if (isTablet) return "140px"
-    return "160px" // Large screens
-  }
+    if (isXSmall) return "80px";
+    if (isSmall) return "100px";
+    if (isMobile) return "120px";
+    if (isTablet) return "140px";
+    return "160px";
+  };
 
   const containerVariants = {
     initial: { opacity: 0 },
@@ -256,7 +229,7 @@ const HeroSection = () => {
       opacity: 1,
       transition: { duration: 1, staggerChildren: 0.3 },
     },
-  }
+  };
 
   const titleVariants = {
     initial: { y: 100, opacity: 0 },
@@ -265,7 +238,7 @@ const HeroSection = () => {
       opacity: 1,
       transition: { duration: 1, ease: "easeOut" },
     },
-  }
+  };
 
   const subtitleVariants = {
     initial: { x: -100, opacity: 0, scale: 0.8 },
@@ -275,7 +248,7 @@ const HeroSection = () => {
       scale: 1,
       transition: { duration: 1.2, ease: "easeOut", delay: 0.3 },
     },
-  }
+  };
 
   const descriptionVariants = {
     initial: { y: 50, opacity: 0 },
@@ -284,7 +257,7 @@ const HeroSection = () => {
       opacity: 1,
       transition: { duration: 1, ease: "easeOut", delay: 0.6 },
     },
-  }
+  };
 
   const buttonVariants = {
     initial: { scale: 0, opacity: 0 },
@@ -301,15 +274,13 @@ const HeroSection = () => {
       borderColor: black,
       transition: { duration: 0.3 },
     },
-  }
+  };
 
-  // Audio visualizer bars with realistic music-responsive animation
   const generateVisualizerBars = (count) =>
     [...Array(count)].map((_, i) => {
-      // Create more realistic music visualization patterns
-      const baseHeight = isPlaying ? 15 : 8
-      const maxHeight = isPlaying ? 80 + Math.sin(currentTime * 0.1 + i) * 20 : 15
-      const animationSpeed = isPlaying ? 0.3 + Math.random() * 0.4 : 2
+      const baseHeight = isPlaying ? 15 : 8;
+      const maxHeight = isPlaying ? 80 + Math.sin(currentTime * 0.1 + i) * 20 : 15;
+      const animationSpeed = isPlaying ? 0.3 + Math.random() * 0.4 : 2;
 
       return (
         <motion.div
@@ -337,91 +308,81 @@ const HeroSection = () => {
             margin: "0 1px",
           }}
         />
-      )
-    })
+      );
+    });
 
   const formatTime = (seconds) => {
-    const mins = Math.floor(seconds / 60)
-    const secs = seconds % 60
-    return `${mins}:${secs.toString().padStart(2, "0")}`
-  }
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
+  };
 
   const handlePlayPause = async () => {
-    if (!audioRef.current) return
-
-    const audio = audioRef.current
-
+    if (!audioRef.current) return;
+    const audio = audioRef.current;
     if (isPlaying) {
-      audio.pause()
-      setIsPlaying(false)
+      audio.pause();
+      setIsPlaying(false);
     } else {
       try {
-        await audio.play()
-        setIsPlaying(true)
+        await audio.play();
+        setIsPlaying(true);
       } catch (error) {
-        console.warn("Playback failed:", error)
-        setIsPlaying(false)
-
-        // For demo purposes, simulate playback if real audio fails
+        console.warn("Playback failed:", error);
+        setIsPlaying(false);
         if (error.name === "NotSupportedError" || error.name === "NotAllowedError") {
-          // Simulate audio playback
-          setIsPlaying(true)
+          setIsPlaying(true);
           const simulateProgress = () => {
             setCurrentTime((prev) => {
-              const next = prev + 1
+              const next = prev + 1;
               if (next >= (duration || musicTracks[currentTrack].duration)) {
-                setIsPlaying(false)
-                return 0
+                setIsPlaying(false);
+                return 0;
               }
-              return next
-            })
-          }
-
-          const interval = setInterval(simulateProgress, 1000)
-
-          // Clean up simulation when paused
+              return next;
+            });
+          };
+          const interval = setInterval(simulateProgress, 1000);
           const cleanup = () => {
-            clearInterval(interval)
-            audio.removeEventListener("pause", cleanup)
-          }
-          audio.addEventListener("pause", cleanup)
+            clearInterval(interval);
+            audio.removeEventListener("pause", cleanup);
+          };
+          audio.addEventListener("pause", cleanup);
         }
       }
     }
-  }
+  };
 
   const skipToNextTrack = () => {
-    const nextIndex = (currentTrack + 1) % musicTracks.length
-    setCurrentTrack(nextIndex)
-  }
+    const nextIndex = (currentTrack + 1) % musicTracks.length;
+    setCurrentTrack(nextIndex);
+  };
 
   const skipToPrevTrack = () => {
-    const prevIndex = currentTrack === 0 ? musicTracks.length - 1 : currentTrack - 1
-    setCurrentTrack(prevIndex)
-  }
+    const prevIndex = currentTrack === 0 ? musicTracks.length - 1 : currentTrack - 1;
+    setCurrentTrack(prevIndex);
+  };
 
   const handleProgressClick = (e) => {
-    const rect = e.currentTarget.getBoundingClientRect()
-    const clickX = e.clientX - rect.left
-    const trackDuration = duration || musicTracks[currentTrack].duration
-    const newTime = Math.floor((clickX / rect.width) * trackDuration)
-
-    setCurrentTime(newTime)
-
+    const rect = e.currentTarget.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const trackDuration = duration || musicTracks[currentTrack].duration;
+    const newTime = Math.floor((clickX / rect.width) * trackDuration);
+    setCurrentTime(newTime);
     if (audioRef.current && !isNaN(audioRef.current.duration)) {
-      audioRef.current.currentTime = newTime
+      audioRef.current.currentTime = newTime;
     }
-  }
+  };
 
   const handleVolumeClick = (e) => {
-    const rect = e.currentTarget.getBoundingClientRect()
-    const clickX = e.clientX - rect.left
-    const newVolume = Math.floor((clickX / rect.width) * 100)
-    setVolume(Math.max(0, Math.min(100, newVolume)))
-  }
+    const rect = e.currentTarget.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const newVolume = Math.floor((clickX / rect.width) * 100);
+    setVolume(Math.max(0, Math.min(100, newVolume)));
+  };
 
-  const currentTrackInfo = musicTracks[currentTrack]
-  const trackDuration = duration || currentTrackInfo.duration
+  const currentTrackInfo = musicTracks[currentTrack];
+  const trackDuration = duration || currentTrackInfo.duration;
 
   return (
     <div
@@ -434,7 +395,6 @@ const HeroSection = () => {
         overflow: "hidden",
       }}
     >
-      {/* Background Video */}
       <video
         ref={videoRef}
         autoPlay
@@ -452,11 +412,9 @@ const HeroSection = () => {
         }}
       >
         <source src="/VI.mp4" type="video/mp4" />
-        {/* Fallback for browsers that don't support video */}
         Your browser does not support the video tag.
       </video>
 
-      {/* Background Overlay */}
       <div
         style={{
           position: "absolute",
@@ -470,7 +428,6 @@ const HeroSection = () => {
         }}
       />
 
-      {/* Animated Background Particles */}
       <div
         style={{
           position: "absolute",
@@ -511,7 +468,6 @@ const HeroSection = () => {
         ))}
       </div>
 
-      {/* Main Content */}
       <motion.div
         variants={containerVariants}
         initial="initial"
@@ -535,7 +491,6 @@ const HeroSection = () => {
             width: "100%",
           }}
         >
-          {/* Slide Content */}
           <div
             style={{
               display: "flex",
@@ -573,49 +528,50 @@ const HeroSection = () => {
               animate="animate"
               style={{
                 fontSize: getSubtitleFontSize(),
-                fontWeight: "900", // Extra bold for "Innovation"
-                color: black, // Changed to black
+                fontWeight: "900",
+                color: black,
                 margin: "0 0 2rem 0",
-                textShadow: `0 4px 20px rgba(0, 0, 0, 0.5), 0 0 40px rgba(0, 0, 0, 0.3)`, // Black shadows
+                textShadow: `0 4px 20px rgba(0, 0, 0, 0.5), 0 0 40px rgba(0, 0, 0, 0.3)`,
                 letterSpacing: isXSmall ? "3px" : "6px",
                 textTransform: "uppercase",
                 lineHeight: "0.9",
                 textAlign: "center",
                 fontFamily: "system-ui, -apple-system, sans-serif",
-                // Removed gradient background and WebkitTextFillColor
-                filter: "drop-shadow(0 0 10px rgba(0, 0, 0, 0.5))", // Black drop shadow
+                filter: "drop-shadow(0 0 10px rgba(0, 0, 0, 0.5))",
               }}
             >
               {heroSlides[currentSlide].subtitle}
             </motion.h2>
 
-            <motion.p
-              key={`description-${currentSlide}`}
-              variants={descriptionVariants}
-              initial="initial"
-              animate="animate"
-              style={{
-                fontSize: getDescriptionFontSize(),
-                color: "rgba(255, 255, 255, 0.9)",
-                margin: "0 0 3rem 0",
-                maxWidth: isXSmall ? "100%" : isSmall ? "95%" : "700px",
-                lineHeight: "1.6",
-                fontWeight: "300",
-                textAlign: "center",
-                letterSpacing: "0.5px",
-                fontFamily: "system-ui, -apple-system, sans-serif",
-              }}
-            >
-              {heroSlides[currentSlide].description}
-            </motion.p>
+            {heroSlides[currentSlide].description && (
+              <motion.p
+                key={`description-${currentSlide}`}
+                variants={descriptionVariants}
+                initial="initial"
+                animate="animate"
+                style={{
+                  fontSize: getDescriptionFontSize(),
+                  color: "rgba(255, 255, 255, 0.9)",
+                  margin: "0 0 3rem 0",
+                  maxWidth: isXSmall ? "100%" : isSmall ? "95%" : "700px",
+                  lineHeight: "1.6",
+                  fontWeight: "300",
+                  textAlign: "center",
+                  letterSpacing: "0.5px",
+                  fontFamily: "system-ui, -apple-system, sans-serif",
+                }}
+              >
+                {heroSlides[currentSlide].description}
+              </motion.p>
+            )}
 
-            {/* Get Started Button */}
             <motion.button
               variants={buttonVariants}
               initial="initial"
               animate="animate"
               whileHover="hover"
               whileTap={{ scale: 0.95 }}
+              onClick={() => navigate("/artist-signup")}
               style={{
                 padding: getButtonPadding(),
                 fontSize: getButtonFontSize(),
@@ -652,7 +608,6 @@ const HeroSection = () => {
             </motion.button>
           </div>
 
-          {/* Audio Player Interface */}
           <motion.div
             initial={{ opacity: 0, y: 100 }}
             animate={{ opacity: 1, y: 0 }}
@@ -668,7 +623,6 @@ const HeroSection = () => {
               boxShadow: `0 10px 40px rgba(255, 69, 0, 0.2)`,
             }}
           >
-            {/* Audio Visualizer */}
             <div
               style={{
                 display: "flex",
@@ -682,7 +636,6 @@ const HeroSection = () => {
               {generateVisualizerBars(isXSmall ? 30 : isSmall ? 40 : 50)}
             </div>
 
-            {/* Player Controls */}
             <div
               style={{
                 display: "flex",
@@ -693,7 +646,6 @@ const HeroSection = () => {
                 gap: isXSmall ? "1rem" : "1.5rem",
               }}
             >
-              {/* Previous Track Button */}
               <motion.button
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
@@ -717,7 +669,6 @@ const HeroSection = () => {
                 ⏮️
               </motion.button>
 
-              {/* Play/Pause Button */}
               <motion.button
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
@@ -743,7 +694,6 @@ const HeroSection = () => {
                 {isLoading ? "⏳" : isPlaying ? "⏸️" : "▶️"}
               </motion.button>
 
-              {/* Next Track Button */}
               <motion.button
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
@@ -767,7 +717,6 @@ const HeroSection = () => {
                 ⏭️
               </motion.button>
 
-              {/* Time Progress */}
               <div
                 style={{
                   flex: 1,
@@ -811,7 +760,6 @@ const HeroSection = () => {
                 </div>
               </div>
 
-              {/* Volume Control */}
               <div
                 style={{
                   display: "flex",
@@ -846,7 +794,6 @@ const HeroSection = () => {
               </div>
             </div>
 
-            {/* Track Info */}
             <div
               style={{
                 textAlign: "center",
@@ -878,7 +825,6 @@ const HeroSection = () => {
         </div>
       </motion.div>
 
-      {/* Slide Indicators */}
       <div
         style={{
           position: "absolute",
@@ -909,7 +855,6 @@ const HeroSection = () => {
         ))}
       </div>
 
-      {/* Scroll Indicator */}
       <motion.div
         animate={{
           y: [0, 15, 0],
@@ -932,7 +877,7 @@ const HeroSection = () => {
         ↓
       </motion.div>
     </div>
-  )
-}
+  );
+};
 
-export default HeroSection
+export default HeroSection;

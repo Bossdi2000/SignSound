@@ -5,6 +5,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import LandingPage from './pages/landing/LandingPage';
+import ArtistSignUpForm from './pages/other/ArtistSignUpForm';
 import AdminRoutes from './pages/admin/AdminRoutes';
 import UserRoutes from './pages/user/UserRoutes';
 import Sample from './pages/other/Sample';
@@ -32,6 +33,7 @@ const App = () => {
           {/* User routes */}
           <Route path="/user/*" element={<UserRoutes />} />
           {/* Admin routes */}
+          <Route path="/artist-signup" element={<ArtistSignUpForm />} />
           <Route path="/admin/*" element={<AdminRoutes />} />
           {/* Route all components that are neither admin or user here as needed */}
           <Route path="/sample" element={<Sample />} />

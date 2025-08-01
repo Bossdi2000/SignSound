@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
+import { X, Instagram, Facebook, Telegram } from '@mui/icons-material'; // Added Telegram icon
 
 const Footer = () => {
   const ref = useRef(null);
@@ -156,8 +157,8 @@ const Footer = () => {
                 height: isXSmall ? '40px' : isMobile ? '50px' : isTablet ? '60px' : '70px',
                 margin: isXSmall || isMobile ? '0 auto 0.75rem' : '0 0 1rem',
                 filter: `drop-shadow(0 0 20px ${flashingOrange})`,
-                borderRadius: '12px', // Added border radius
-                overflow: 'hidden', // Ensure image respects border radius
+                borderRadius: '12px',
+                overflow: 'hidden',
               }}
             >
               <img
@@ -167,7 +168,7 @@ const Footer = () => {
                   width: '100%',
                   height: '100%',
                   objectFit: 'contain',
-                  borderRadius: '12px', // Ensure image itself is rounded
+                  borderRadius: '12px',
                 }}
                 loading="lazy"
                 onError={(e) => (e.target.src = '/placeholder.svg?height=70&width=70&text=Logo')}
@@ -268,14 +269,10 @@ const Footer = () => {
               }}
             >
               Email:{' '}
-              <a href="mailto:info@audiovibe.studio" style={{ color: flashingOrange, textDecoration: 'none' }}>
-                info@audiovibe.studio
+              <a href="mailto:sounddotsign@gmail.com" style={{ color: flashingOrange, textDecoration: 'none' }}>
+                sounddotsign@gmail.com
               </a>
               <br />
-              Phone:{' '}
-              <a href="tel:+1234567890" style={{ color: flashingOrange, textDecoration: 'none' }}>
-                +1 (234) 567-890
-              </a>
             </p>
             <h4
               style={{
@@ -311,7 +308,7 @@ const Footer = () => {
                   fontSize: isXSmall ? '0.75rem' : isMobile ? '0.9rem' : '1rem',
                   outline: 'none',
                   flexGrow: 1,
-                  minHeight: '44px', // Touch-friendly height
+                  minHeight: '44px',
                 }}
                 aria-label="Email for newsletter"
                 required
@@ -330,7 +327,7 @@ const Footer = () => {
                   fontWeight: 'bold',
                   cursor: 'pointer',
                   transition: 'all 0.3s ease',
-                  minHeight: '44px', // Touch-friendly height
+                  minHeight: '44px',
                 }}
                 onMouseEnter={(e) => {
                   e.target.style.background = flashingOrange;
@@ -365,9 +362,10 @@ const Footer = () => {
             }}
           >
             {[
-              { platform: 'Twitter', href: 'https://x.com/sounddotsign', icon: '\u1F426' }, // 🐦
-              { platform: 'Instagram', href: '$', icon: '\u1F4F8' }, // 📸
-              { platform: 'LinkedIn', href: '$', icon: '\u1F4BC' }, // 💼
+              { platform: 'Twitter', href: 'https://x.com/sounddotsign', icon: <X /> },
+              { platform: 'Instagram', href: 'https://www.instagram.com/sounddotsign', icon: <Instagram /> },
+              { platform: 'Facebook', href: '$', icon: <Facebook /> }, // Replace $ with actual Facebook link
+              { platform: 'Telegram', href: '$', icon: <Telegram /> }, // Replace $ with actual Telegram link
             ].map((social, index) => (
               <motion.a
                 key={index}
@@ -383,7 +381,7 @@ const Footer = () => {
                   display: 'inline-flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  width: '44px', // Touch-friendly size
+                  width: '44px',
                   height: '44px',
                 }}
                 aria-label={`Follow us on ${social.platform}`}
