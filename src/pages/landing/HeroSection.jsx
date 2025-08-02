@@ -172,7 +172,7 @@ const HeroSection = () => {
     {
       title: "Sound Design",
       subtitle: "Innovation",
-      description: "Join SignSound Studios to create groundbreaking audio experiences.",
+      description: "Join Orange Sound Revolution to create groundbreaking audio experiences.",
       bg: "linear-gradient(135deg, rgba(26, 26, 26, 0.7) 0%, rgba(255, 101, 0, 0.6) 50%, rgba(0, 0, 0, 0.8) 100%)",
     },
   ];
@@ -591,7 +591,7 @@ const HeroSection = () => {
                 transition: "all 0.3s ease",
                 fontFamily: "system-ui, -apple-system, sans-serif",
               }}
-              aria-label="Get Started with SignSound Studio"
+              aria-label="Get Started with Orange Sound Revolution"
             >
               <div
                 style={{

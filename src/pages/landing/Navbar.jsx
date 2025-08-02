@@ -242,12 +242,13 @@ const Navbar = () => {
           >
             <motion.img
               animate={pulseAnimation}
-              src="/TABY.jpeg"
+              src="/TAB.jpeg"
               alt="SignSound Studio Logo"
               style={{
                 width: getLogoSize(),
                 height: getLogoSize(),
                 objectFit: 'contain',
+                borderRadius: '25%',
                 filter: `drop-shadow(0 0 8px ${flashingOrange})`,
               }}
               loading="lazy"
@@ -276,7 +277,7 @@ const Navbar = () => {
                   marginTop: '-1px',
                 }}
               >
-                PROFESSIONAL AUDIO
+                Orange sound Revolution
               </div>
             </div>
           </motion.div>
@@ -528,7 +529,7 @@ const Navbar = () => {
                       letterSpacing: '0.5px',
                     }}
                   >
-                    PROFESSIONAL AUDIO
+                    Orange Sound Revolution
                   </div>
                 </div>
               </motion.div>

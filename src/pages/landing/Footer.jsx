@@ -162,13 +162,13 @@ const Footer = () => {
               }}
             >
               <img
-                src="/TABY.jpeg"
+                src="/TAB.jpeg"
                 alt="AudioVibe Studio Logo"
                 style={{
-                  width: '100%',
-                  height: '100%',
+                  width: '65%',
+                  height: '65%',
                   objectFit: 'contain',
-                  borderRadius: '12px',
+                  borderRadius: '10px',
                 }}
                 loading="lazy"
                 onError={(e) => (e.target.src = '/placeholder.svg?height=70&width=70&text=Logo')}
@@ -183,7 +183,7 @@ const Footer = () => {
                 fontFamily: '"Orbitron", monospace, system-ui',
               }}
             >
-              AudioVibe Studio
+              Orange Sound Revolution
             </h3>
             <p
               style={{
