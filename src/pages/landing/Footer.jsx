@@ -162,7 +162,7 @@ const Footer = () => {
               }}
             >
               <img
-                src="/TAB.jpeg"
+                src="/REAL.jpeg"
                 alt="AudioVibe Studio Logo"
                 style={{
                   width: '65%',

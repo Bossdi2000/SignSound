@@ -120,12 +120,6 @@ const TeamSection = () => {
     return "repeat(4, 1fr)"
   }
 
-  const getStatsColumns = () => {
-    if (isXSmall || isSmall) return "repeat(2, 1fr)"
-    if (isMedium || isLarge) return "repeat(2, 1fr)"
-    return "repeat(4, 1fr)"
-  }
-
   const getContainerPadding = () => {
     if (isXSmall) return "1.5rem 0.8rem"
     if (isSmall) return "2rem 1rem"
@@ -309,7 +303,6 @@ const TeamSection = () => {
             display: "grid",
             gridTemplateColumns: getGridColumns(),
             gap: isXSmall ? "0.8rem" : isSmall ? "1rem" : isMedium ? "1.2rem" : "1.5rem",
-            marginBottom: isXSmall ? "1.5rem" : isSmall ? "2rem" : "2.5rem",
           }}
         >
           {teamMembers.map((member) => (
@@ -472,84 +465,6 @@ const TeamSection = () => {
               </div>
             </motion.div>
           ))}
-        </motion.div>
-
-        {/* Responsive Team Statistics */}
-        <motion.div
-          variants={cardVariants}
-          style={{
-            background: "rgba(255, 69, 0, 0.1)",
-            backdropFilter: "blur(15px)",
-            borderRadius: isXSmall ? "15px" : "20px",
-            padding: isXSmall ? "1.2rem" : isSmall ? "1.5rem" : "2rem",
-            border: `2px solid ${flashingOrange}`,
-            textAlign: "center",
-          }}
-        >
-          <h3
-            style={{
-              fontSize: isXSmall ? "1.2rem" : isSmall ? "1.5rem" : isMedium ? "1.8rem" : "2rem",
-              color: "white",
-              marginBottom: isXSmall ? "1rem" : "1.5rem",
-              fontWeight: "bold",
-            }}
-          >
-            Collective Experience
-          </h3>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: getStatsColumns(),
-              gap: isXSmall ? "0.8rem" : isSmall ? "1rem" : "1.2rem",
-            }}
-          >
-            {[
-              { number: "90+", label: "Years Combined", icon: "⏰" },
-              { number: "20+", label: "Major Awards", icon: "🏆" },
-              { number: "600+", label: "Albums Produced", icon: "💿" },
-              { number: "75+", label: "Chart Toppers", icon: "📈" },
-            ].map((stat, index) => (
-              <motion.div
-                key={index}
-                initial={{ scale: 0, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: index * 0.2 + 1, duration: 0.6 }}
-                style={{
-                  background: "rgba(0, 0, 0, 0.5)",
-                  padding: isXSmall ? "0.8rem" : isSmall ? "1rem" : "1.2rem",
-                  borderRadius: "15px",
-                  border: `1px solid rgba(255, 69, 0, 0.3)`,
-                }}
-              >
-                <div
-                  style={{
-                    fontSize: isXSmall ? "1.2rem" : isSmall ? "1.5rem" : "1.8rem",
-                    marginBottom: "0.5rem",
-                  }}
-                >
-                  {stat.icon}
-                </div>
-                <div
-                  style={{
-                    fontSize: isXSmall ? "1.2rem" : isSmall ? "1.5rem" : "1.8rem",
-                    fontWeight: "bold",
-                    color: flashingOrange,
-                    marginBottom: "0.3rem",
-                  }}
-                >
-                  {stat.number}
-                </div>
-                <div
-                  style={{
-                    fontSize: isXSmall ? "0.7rem" : isSmall ? "0.8rem" : "0.9rem",
-                    color: "white",
-                  }}
-                >
-                  {stat.label}
-                </div>
-              </motion.div>
-            ))}
-          </div>
         </motion.div>
 
         {/* Responsive Member Detail Modal */}

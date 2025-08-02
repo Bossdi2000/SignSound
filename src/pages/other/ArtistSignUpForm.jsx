@@ -349,7 +349,7 @@ Please send this to: sounddotsign@gmail.com
   const formFields = [
     {
       id: "signName",
-      label: "Artist Name / Alias",
+      label: "SignName",
       placeholder: "What should we call you?",
       type: "text",
       icon: "🎭",

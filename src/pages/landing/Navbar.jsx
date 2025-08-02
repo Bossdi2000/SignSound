@@ -242,7 +242,7 @@ const Navbar = () => {
           >
             <motion.img
               animate={pulseAnimation}
-              src="/TAB.jpeg"
+              src="/REAL.jpeg"
               alt="SignSound Studio Logo"
               style={{
                 width: getLogoSize(),
