@@ -92,7 +92,7 @@ const TeamSection = () => {
     {
       id: 6,
       name: "Dyce",
-      role: "Social Media Manager, Creative Director",
+      role: "Social media and Digital Creator Manager",
       image: "/M3.jpg",
       bio: "Singer, rapper, songwriter, Video editor.",
       skills: ["Singer", "Rapper", "Songwriter", "Video Editor"],
@@ -101,7 +101,7 @@ const TeamSection = () => {
     {
       id: 7,
       name: "Cybrox",
-      role: "A&R Representative, Artist Research Director",
+      role: "Creative Director and Artist Research Director",
       image: "/M5.jpg",
       bio: "Singer, rapper, songwriter",
       skills: ["Singer", "Rapper", "Songwriter", "A&R Research"],

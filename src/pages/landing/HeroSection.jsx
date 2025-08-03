@@ -26,7 +26,7 @@ const HeroSection = () => {
     {
       name: "Chill Vibes",
       duration: 185,
-      artist: "SignSound Studios",
+      artist: "Orange Sound Revolution",
       src: "Tab.mp3",
     },
   ];
@@ -170,8 +170,8 @@ const HeroSection = () => {
 
   const heroSlides = [
     {
-      title: "Sound Design",
-      subtitle: "Innovation",
+      title: "Orange Sound",
+      subtitle: "Revolution",
       description: "Join Orange Sound Revolution to create groundbreaking audio experiences.",
       bg: "linear-gradient(135deg, rgba(26, 26, 26, 0.7) 0%, rgba(255, 101, 0, 0.6) 50%, rgba(0, 0, 0, 0.8) 100%)",
     },
